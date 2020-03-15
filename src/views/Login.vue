@@ -2,10 +2,10 @@
   <div class="login">
     <header class="login-header">
       <img @click="toIndex" src="@/assets/img/logo.png" alt="中餐厅" class="logo">
-      <div @click="toRegister" class="register">免费注册</div>
+      <div @click="changeForm(true)" class="register">免费注册</div>
     </header>
     <div class="login-main">
-      <div v-if="!isRegister" class="login-from">
+      <div v-show="!isRegister" class="login-from">
         <div class="login-tit">登录中餐厅</div>
         <el-form label-position="top" :model="loginForm" :rules="loginRules" ref="loginForm" label-width="80px">
           <el-form-item label="手机号/邮箱" prop="username">
@@ -15,12 +15,12 @@
             <el-input v-model="loginForm.password" type="password" placeholder="请输入密码"></el-input>
           </el-form-item>
           <el-form-item>
-            <p class="new-user"><span @click="toRegister">新用户注册</span></p>
+            <p class="new-user"><span @click="changeForm(true)">新用户注册</span></p>
             <el-button @click="login" class="login-btn" type="primary">登录</el-button>
           </el-form-item>
         </el-form>
       </div>
-      <div v-if="isRegister" class="register-from">
+      <div v-show="isRegister" class="register-from">
         <div class="register-tit">注册中餐厅账号</div>
         <el-form :model="registerForm" :rules="registerRules" ref="registerForm" label-width="80px">
           <el-form-item label="类型">
@@ -41,14 +41,14 @@
           <el-form-item label="邮箱" prop="email">
             <el-input v-model="registerForm.email" placeholder="请输入邮箱"></el-input>
           </el-form-item>
-          <el-form-item label="密码" prop="password">
-            <el-input v-model="registerForm.password" type="password" placeholder="请输入密码"></el-input>
+          <el-form-item label="密码" prop="newPassword">
+            <el-input v-model="registerForm.newPassword" type="password" placeholder="请输入密码"></el-input>
           </el-form-item>
           <el-form-item label="确认密码" prop="confirm">
             <el-input v-model="registerForm.confirm" type="password" placeholder="请确认密码"></el-input>
           </el-form-item>
           <el-form-item>
-            <p class="login-user"><span @click="toLogin">去登录</span></p>
+            <p class="login-user"><span @click="changeForm(false)">去登录</span></p>
             <el-button @click="register" class="register-btn" type="primary">注册</el-button>
           </el-form-item>
         </el-form>
@@ -112,7 +112,7 @@ export default {
     const verifyConfirm = (rule, value, callback) => {
       if (!value) {
         callback(new Error('请确认密码'))
-      } else if (this.registerForm.password !== value) {
+      } else if (this.registerForm.newPassword !== value) {
         callback(new Error('请确认两次输入的密码一致'))
       } else {
         callback()
@@ -129,7 +129,7 @@ export default {
         name: '',
         email: '',
         phone: '',
-        password: '',
+        newPassword: '',
         headImage: 'a',
         confirm: ''
       },
@@ -139,12 +139,12 @@ export default {
         ],
         password: [
           { required: true, message: '请输入用户密码', trigger: 'blur' },
-          { min: 5, message: '密码不少于5位数', trigger: 'blur' }
+          { min: 5, message: '密码不少于5位数', trigger: 'change' }
         ]
       },
       registerRules: {
         name: [
-          { required: true, message: '请输入用户昵称', trigger: ['blur', 'change'] }
+          { required: true, message: '请输入用户昵称', trigger: 'blur' }
         ],
         email: [
           { required: true, validator: verifyEmail, trigger: 'blur' }
@@ -152,8 +152,8 @@ export default {
         phone: [
           { required: true, validator: verifyPhone, trigger: 'blur' }
         ],
-        password: [
-          { required: true, validator: verifyPassword, trigger: ['blur', 'change'] }
+        newPassword: [
+          { required: true, validator: verifyPassword, trigger: 'blur' }
         ],
         confirm: [
           { required: true, validator: verifyConfirm, trigger: 'blur' }
@@ -171,12 +171,13 @@ export default {
     toIndex () {
       this.$router.push('/index')
     },
-    toRegister () {
-      this.isRegister = true
-      this.$refs.loginForm.resetFields()
-    },
-    toLogin () {
-      this.isRegister = false
+    changeForm (val) {
+      this.isRegister = val
+      const formName = val ? 'registerForm' : 'loginForm'
+      Object.assign(this.$data[formName], this.$options.data()[formName])
+      this.$nextTick(() => {
+        this.$refs && this.$refs[formName] && this.$refs[formName].resetFields()
+      })
     },
     async login () {
       try {
