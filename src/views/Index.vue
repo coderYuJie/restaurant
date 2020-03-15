@@ -1,25 +1,6 @@
 <template>
   <div class="index">
-    <header class="index-header">
-      <img src="@/assets/img/logo.png" alt="中餐厅" class="logo">
-      <div class="search">
-        <el-input placeholder="请输入餐厅名" v-model="query">
-        <el-button slot="append">搜索</el-button>
-      </el-input>
-      </div>
-      <div class="user">
-        <el-dropdown>
-          <span class="el-dropdown-link">
-            小明<i class="el-icon-caret-bottom el-icon--right"></i>
-          </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item icon="el-icon-tickets">我的订单</el-dropdown-item>
-            <el-dropdown-item icon="el-icon-tickets">主页</el-dropdown-item>
-            <el-dropdown-item icon="el-icon-switch-button">退出</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
-      </div>
-    </header>
+    <!-- <restaurant-header></restaurant-header> -->
     <div class="index-main">
       <!-- 餐厅分类 -->
       <div class="restaurant-classify">
@@ -75,26 +56,6 @@ export default {
 
 <style lang="less" scoped>
 .index {
-  .index-header {
-    display: flex;
-    height: 80px;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 30px;
-
-    .search {
-      width: 500px;
-
-      // /deep/ .el-input__inner {
-      //   border-color: #ff5000;
-      // }
-      // /deep/ .el-input-group__append button.el-button {
-      //   background-color: #ff5000;
-      //   color: #fff;
-      //   border: none;
-      // }
-    }
-  }
   .index-main {
     padding: 0 30px;
 

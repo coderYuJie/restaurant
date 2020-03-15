@@ -1,9 +1,6 @@
 <template>
   <div class="login">
-    <header class="login-header">
-      <img @click="toIndex" src="@/assets/img/logo.png" alt="中餐厅" class="logo">
-      <div @click="changeForm(true)" class="register">免费注册</div>
-    </header>
+    <restaurant-header @register="changeForm"></restaurant-header>
     <div class="login-main">
       <div v-show="!isRegister" class="login-from">
         <div class="login-tit">登录中餐厅</div>
@@ -167,10 +164,13 @@ export default {
       }
     }
   },
+  watch: {
+    '$route.query.register': function (nv, ov) {
+      console.log('asdfasdf', nv)
+      nv && (this.isRegister = true)
+    }
+  },
   methods: {
-    toIndex () {
-      this.$router.push('/index')
-    },
     changeForm (val) {
       this.isRegister = val
       const formName = val ? 'registerForm' : 'loginForm'
@@ -183,13 +183,14 @@ export default {
       try {
         await this.$refs.loginForm.validate()
         const res = await this.$axios.post('/public/login', qs.stringify(this.loginForm))
-        if (res.data.code === 0) {
+        if (res.code === 0) {
           this.$message.success('登录成功')
+          sessionStorage.setItem('sessionId', res.data.sessionId)
           // this.$router.push('/index')
-          const res = await this.$axios.post('/sysUser/getUser')
-          console.log(res)
+          const ress = await this.$axios.get('/sysUser/getUser')
+          console.log(ress)
         } else {
-          this.$message.error(res.data.msg)
+          this.$message.error(res.msg)
         }
       } catch (e) {
         console.log(e)
@@ -198,11 +199,18 @@ export default {
     async register () {
       try {
         await this.$refs.registerForm.validate()
-        // const postData = JSON.parse(JSON.stringify(this.registerForm))
-        // postData.userType = parseInt(postData.userType)
-        // delete postData.confirm
-        // const res = this.$axios.post('/public/register', qs.stringify(postData))
-        // console.log(res)
+        const res = await this.$axios.post('/public/register', qs.stringify({
+          name: this.registerForm.name,
+          password: this.registerForm.newPassword,
+          email: this.registerForm.email,
+          phone: this.registerForm.phone,
+          userType: Number(this.registerForm.userType),
+          headImage: this.registerForm.headImage
+        }))
+        if (res.code === 0) {
+          this.$message.success('注册成功')
+          this.$router.push('/login')
+        }
       } catch (e) {
         console.log(e)
       }
@@ -226,13 +234,6 @@ export default {
     box-sizing: border-box;
     border-bottom: 1px solid #ccc;
 
-    .register {
-      cursor: pointer;
-      line-height: 60px;
-    }
-    .register:hover {
-      color: orange;
-    }
   }
 
   .login-main {
