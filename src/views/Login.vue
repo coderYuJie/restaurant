@@ -5,7 +5,7 @@
       <div @click="toRegister" class="register">免费注册</div>
     </header>
     <div class="login-main">
-      <div v-if="isRegister" class="login-from">
+      <div v-if="!isRegister" class="login-from">
         <div class="login-tit">登录中餐厅</div>
         <el-form label-position="top" :model="loginForm" :rules="loginRules" ref="loginForm" label-width="80px">
           <el-form-item label="手机号/邮箱" prop="username">
@@ -20,7 +20,7 @@
           </el-form-item>
         </el-form>
       </div>
-      <div v-if="!isRegister" class="register-from">
+      <div v-if="isRegister" class="register-from">
         <div class="register-tit">注册中餐厅账号</div>
         <el-form :model="registerForm" :rules="registerRules" ref="registerForm" label-width="80px">
           <el-form-item label="类型">
@@ -41,7 +41,7 @@
           <el-form-item label="邮箱" prop="email">
             <el-input v-model="registerForm.email" placeholder="请输入邮箱"></el-input>
           </el-form-item>
-          <el-form-item label="密码" prop="passWord">
+          <el-form-item label="密码" prop="password">
             <el-input v-model="registerForm.password" type="password" placeholder="请输入密码"></el-input>
           </el-form-item>
           <el-form-item label="确认密码" prop="confirm">
@@ -110,24 +110,16 @@ export default {
       }
     }
     const verifyConfirm = (rule, value, callback) => {
-      if (this.registerForm.password) {
-        if (!value) {
-          callback(new Error('请确认密码'))
-        } else if (!this.registerForm.password === value) {
-          callback(new Error('请确认两次输入的密码一致'))
-        } else {
-          callback()
-        }
+      if (!value) {
+        callback(new Error('请确认密码'))
+      } else if (this.registerForm.password !== value) {
+        callback(new Error('请确认两次输入的密码一致'))
       } else {
-        if (!value) {
-          callback(new Error('请确认密码'))
-        } else {
-          callback()
-        }
+        callback()
       }
     }
     return {
-      isRegister: true,
+      isRegister: false,
       loginForm: {
         username: '',
         password: ''
@@ -160,7 +152,7 @@ export default {
         phone: [
           { required: true, validator: verifyPhone, trigger: 'blur' }
         ],
-        passWord: [
+        password: [
           { required: true, validator: verifyPassword, trigger: ['blur', 'change'] }
         ],
         confirm: [
@@ -180,11 +172,11 @@ export default {
       this.$router.push('/index')
     },
     toRegister () {
-      this.isRegister = false
+      this.isRegister = true
       this.$refs.loginForm.resetFields()
     },
     toLogin () {
-      this.isRegister = true
+      this.isRegister = false
     },
     async login () {
       try {
