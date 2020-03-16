@@ -1,21 +1,31 @@
 <template>
 <div class="restaurant-header">
   <header class="index-header">
-    <img src="@/assets/img/logo.png" alt="中餐厅" class="logo">
+    <img @click="goHome" src="@/assets/img/logo.png" alt="中餐厅" class="logo">
     <div v-if="!isLogin" class="search">
       <el-input placeholder="请输入餐厅名" v-model="query">
       <el-button @click="handlerClick" slot="append">搜索</el-button>
     </el-input>
     </div>
     <div v-if="!isLogin" class="user">
-      <el-dropdown>
+      <el-dropdown @command="handleCommand">
         <span class="el-dropdown-link">
-          小明<i class="el-icon-caret-bottom el-icon--right"></i>
+          {{userData&&userData.name}}<i class="el-icon-caret-bottom el-icon--right"></i>
         </span>
-        <el-dropdown-menu slot="dropdown">
+        <el-dropdown-menu v-if="isPersonal" slot="dropdown">
           <el-dropdown-item icon="el-icon-tickets">我的订单</el-dropdown-item>
-          <el-dropdown-item icon="el-icon-tickets">主页</el-dropdown-item>
-          <el-dropdown-item icon="el-icon-switch-button">退出</el-dropdown-item>
+          <el-dropdown-item command="/personal" icon="el-icon-tickets">个人中心</el-dropdown-item>
+          <el-dropdown-item command="logout" icon="el-icon-switch-button">退出</el-dropdown-item>
+        </el-dropdown-menu>
+        <el-dropdown-menu v-if="isBusiness" slot="dropdown">
+          <el-dropdown-item icon="el-icon-tickets">我的餐厅</el-dropdown-item>
+          <el-dropdown-item icon="el-icon-tickets">收益数据</el-dropdown-item>
+          <el-dropdown-item command="logout" icon="el-icon-switch-button">退出</el-dropdown-item>
+        </el-dropdown-menu>
+        <el-dropdown-menu  v-if="isAdmin" slot="dropdown">
+          <el-dropdown-item command="/userManagement" icon="el-icon-tickets">用户管理</el-dropdown-item>
+          <el-dropdown-item icon="el-icon-tickets">平台数据</el-dropdown-item>
+          <el-dropdown-item command="logout" icon="el-icon-switch-button">退出</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
@@ -29,24 +39,73 @@ export default {
   name: 'RestaurantHeader',
   data () {
     return {
-      query: ''
+      query: '',
+      userData: {}
     }
   },
   methods: {
+    async getUser () {
+      try {
+        if (this.$route.path === '/login') return
+        const res = await this.$axios.get('/sysUser/getUser')
+        if (res.code === 0) {
+          this.userData = res.data
+        } else {
+          this.$message.error(res.msg)
+        }
+      } catch (e) {
+        console.log(e)
+      }
+    },
+    goHome () {
+      this.$router.push('/index')
+    },
     handlerClick () {
-      this.$emit()
+      this.$emit('search', this.query)
+      this.query = ''
     },
     registerClick () {
       this.$emit('register', true)
-      // this.$router.push({ path: '/login', query: { register: true } })
-
-      // }
+    },
+    async handleCommand (command) {
+      try {
+        if (command === 'logout') {
+          await this.$confirm('你确定要退出登录吗？', '温馨提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          })
+          const res = await this.$axios.post('/public/logout')
+          if (res.code === 0) {
+            this.$router.push('/login')
+            this.$message.success('已退出登录')
+          } else {
+            this.$message.error(res.msg)
+          }
+        } else {
+          this.$router.push(command)
+        }
+      } catch (e) {
+        console.log(e)
+      }
     }
   },
   computed: {
     isLogin () {
       return this.$route.path === '/login'
+    },
+    isBusiness () {
+      return this.userData && this.userData.userType === 2
+    },
+    isPersonal () {
+      return this.userData && this.userData.userType === 3
+    },
+    isAdmin () {
+      return this.userData && this.userData.userType === 1
     }
+  },
+  created () {
+    this.getUser()
   }
 }
 </script>

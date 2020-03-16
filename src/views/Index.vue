@@ -1,6 +1,6 @@
 <template>
   <div class="index">
-    <!-- <restaurant-header></restaurant-header> -->
+    <restaurant-header @search="handleSearch" :userData="userData"></restaurant-header>
     <div class="index-main">
       <!-- 餐厅分类 -->
       <div class="restaurant-classify">
@@ -9,19 +9,19 @@
 
       <!-- 餐厅展示列表 -->
       <ul class="restaurant-list">
-        <li class="restaurant-item">
+        <li v-for="item in restaurantList" :key="item.id" class="restaurant-item">
           <img src="@/assets/img/restaurant.png" alt="">
           <div class="item-main">
-            <div class="item-tit">米其林餐厅</div>
+            <div class="item-tit">{{item.name}}</div>
             <div class="item-info">
-              <span>口味:5</span>
-              <span>人均:99</span>
-              <span>评分:5</span>
-              <span>评论:345</span>
+              <span>口味:{{item.tatste}}</span>
+              <span>人均:{{item.consumePerCost}}</span>
+              <span>评分:{{item.gradeScore}}</span>
+              <span>评论:{{item.commentCount}}</span>
             </div>
             <div class="tag">
               标签：
-              <span>五角场</span>
+              <span>{{item.label}}</span>
               <span>火锅/干锅</span>
               <span>特色口味</span>
             </div>
@@ -30,27 +30,65 @@
           <div class="hot"></div>
         </li>
       </ul>
+      <!-- 分页 -->
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page.sync="search.current"
+        :page-size="search.size"
+        layout="prev, pager, next, jumper"
+        :total="total">
+      </el-pagination>
     </div>
   </div>
 </template>
 
 <script>
+import qs from 'qs'
 export default {
   name: 'Index',
   data () {
     return {
-      query: ''
+      userData: null,
+      search: {
+        size: 5,
+        current: 1,
+        diningRoomName: ''
+      },
+      restaurantList: [],
+      total: 0
+    }
+  },
+  created () {
+    this.getRestaurantList()
+  },
+  methods: {
+
+    async getRestaurantList () {
+      try {
+        const res = await this.$axios.post('/public/index', qs.stringify(this.search))
+        if (res.code === 0) {
+          this.restaurantList = res.data.diningRoomIPage.records
+          this.total = res.data.diningRoomIPage.total
+        } else {
+          this.$message.error(res.msg)
+        }
+      } catch (e) {
+        console.log(e)
+      }
+    },
+    handleSizeChange (val) {
+      this.search.size = val
+    },
+    handleCurrentChange (val) {
+      this.search.current = val
+    },
+    handleSearch (val) {
+      this.search.diningRoomName = val
+      this.search.current = 1
+      this.getRestaurantList()
     }
   }
-  // mounted () {
-  //   this.getUser()
-  // },
-  // methods: {
-  //   async getUser () {
-  //     const res = await this.$axios.post('/sysUser/getUser')
-  //     console.log(res)
-  //   }
-  // }
 }
 </script>
 
@@ -117,6 +155,10 @@ export default {
           background-size: 100%;
         }
       }
+    }
+    /deep/ .el-pagination {
+      text-align: center;
+      margin-top: 20px;
     }
   }
 }

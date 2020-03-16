@@ -6,10 +6,10 @@
         <div class="login-tit">登录中餐厅</div>
         <el-form label-position="top" :model="loginForm" :rules="loginRules" ref="loginForm" label-width="80px">
           <el-form-item label="手机号/邮箱" prop="username">
-            <el-input v-model="loginForm.username" placeholder="请输入手机号或邮箱"></el-input>
+            <el-input @keyup.enter.native="login" v-model="loginForm.username" placeholder="请输入手机号或邮箱"></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="password">
-            <el-input v-model="loginForm.password" type="password" placeholder="请输入密码"></el-input>
+            <el-input @keyup.enter.native="login" v-model="loginForm.password" type="password" placeholder="请输入密码"></el-input>
           </el-form-item>
           <el-form-item>
             <p class="new-user"><span @click="changeForm(true)">新用户注册</span></p>
@@ -186,9 +186,8 @@ export default {
         if (res.code === 0) {
           this.$message.success('登录成功')
           sessionStorage.setItem('sessionId', res.data.sessionId)
-          // this.$router.push('/index')
-          const ress = await this.$axios.get('/sysUser/getUser')
-          console.log(ress)
+          this.$refs.loginForm.resetFields()
+          this.$router.push('/index')
         } else {
           this.$message.error(res.msg)
         }
@@ -209,6 +208,7 @@ export default {
         }))
         if (res.code === 0) {
           this.$message.success('注册成功')
+          this.$refs.registerForm.resetFields()
           this.$router.push('/login')
         }
       } catch (e) {
