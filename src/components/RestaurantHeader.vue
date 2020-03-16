@@ -18,7 +18,7 @@
           <el-dropdown-item command="logout" icon="el-icon-switch-button">退出</el-dropdown-item>
         </el-dropdown-menu>
         <el-dropdown-menu v-if="isBusiness" slot="dropdown">
-          <el-dropdown-item icon="el-icon-tickets">我的餐厅</el-dropdown-item>
+          <el-dropdown-item command="/merchant-detail" icon="el-icon-tickets">我的餐厅</el-dropdown-item>
           <el-dropdown-item icon="el-icon-tickets">收益数据</el-dropdown-item>
           <el-dropdown-item command="logout" icon="el-icon-switch-button">退出</el-dropdown-item>
         </el-dropdown-menu>
@@ -112,6 +112,10 @@ export default {
 
 <style lang="less">
 .restaurant-header {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  background-color: #fff;
   .index-header {
     display: flex;
     height: 80px;

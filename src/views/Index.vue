@@ -9,7 +9,7 @@
 
       <!-- 餐厅展示列表 -->
       <ul class="restaurant-list">
-        <li v-for="item in restaurantList" :key="item.id" class="restaurant-item">
+        <li v-for="item in restaurantList" :key="item.id" class="restaurant-item" @click="skipDetail(item.id)">
           <img src="@/assets/img/restaurant.png" alt="">
           <div class="item-main">
             <div class="item-tit">{{item.name}}</div>
@@ -87,6 +87,13 @@ export default {
       this.search.diningRoomName = val
       this.search.current = 1
       this.getRestaurantList()
+    },
+    // 跳转详情
+    skipDetail (id) {
+      this.$router.push({
+        name: 'diningDetail',
+        query: { id: id }
+      })
     }
   }
 }
@@ -95,6 +102,7 @@ export default {
 <style lang="less" scoped>
 .index {
   .index-main {
+    margin-top: 100px;
     padding: 0 30px;
 
     .restaurant-list {
