@@ -84,9 +84,8 @@ export default {
         method: 'post',
         data: qs.stringify({ diningRoomId: 1 })
       }).then(res => {
-        const data = res.data
-        if (data) {
-          this.detailData = data.data
+        if (res) {
+          this.detailData = res.data
         } else {
         }
       }).catch(err => {
