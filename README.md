@@ -22,3 +22,8 @@ yarn lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+个人   18511223344    密码： admin
+
+管理员   18599663322   密码：admin
+
+18599887744    admin
