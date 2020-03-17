@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Index from '@/views/Index.vue'
 import Login from '@/views/Login.vue'
 import diningDetail from '@/views/dining-detail.vue'
+import merchantDetail from '@/views/merchant-detail.vue'
 import Personal from '@/views/Personal.vue'
 import UserManagement from '@/views/UserManagement.vue'
 import Statistics from '../views/Statistics.vue'
@@ -34,6 +35,12 @@ const routes = [
     path: '/dining-detail',
     name: 'diningDetail',
     component: diningDetail
+  },
+  // 商户-查看自己的餐厅详情 merchantDetail
+  {
+    path: '/merchant-detail',
+    name: 'merchantDetail',
+    component: merchantDetail
   },
   {
     path: '/personal',
