@@ -18,7 +18,7 @@
           <div class="item"><span>热线：</span>{{diningRoomData && diningRoomData.phone || "--"}}</div>
           <!-- 开店时间-关店时间 -->
           <div class="item"><span>时间：</span>{{diningRoomData && diningRoomData.phone || "--"}}</div>
-          <div class="item"><span>餐位：</span>{{diningRoomData && diningRoomData.tables || "--"}}</div>
+          <div class="item"><span>剩余餐位：</span>{{lastTables}}</div>
           <!--  -->
           <div class="order-btn item">立即预约</div>
         </div>
@@ -90,7 +90,8 @@ export default {
         comment: '', // 评论内容
         comment_pic: []
       }, // 评论
-      userId: null
+      userId: null,
+      lastTables: null // 剩余餐位
     }
   },
   computed: {
@@ -103,6 +104,10 @@ export default {
       immediate: true,
       handler (nv) {
         nv && (this.getData(nv))
+        if (nv) {
+          this.getData(nv)
+          this.getLastTables()
+        }
       }
     }
   },
@@ -137,6 +142,22 @@ export default {
     hideDialog () {
       this.showDialog = false
       this.getData(this.$route.query.id)
+    },
+
+    // 获取剩余餐位 GET /dining-menu-order/selectDiningRoomTables/{id}
+    getLastTables () {
+      this.$axios({
+        url: `/dining-menu-order/selectDiningRoomTables/{id}?id=${this.$route.query.id}`,
+        method: 'GET'
+      }).then(res => {
+        if (res) {
+          this.lastTables = res.data
+        } else {
+          this.$message.error(res.msg)
+        }
+      }).catch(err => {
+        console.log(err)
+      })
     }
   }
 
