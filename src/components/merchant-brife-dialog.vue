@@ -131,6 +131,22 @@
       </el-form-item>
     </el-form>
 
+    <!-- 用户修改订单信息 deku有bug -->
+    <el-form
+      v-show="formType==6"
+      label-width="80px"
+      :model="editOrderInfo">
+      <el-form-item label="价格">
+        <el-input-number v-model="editOrderInfo.prize" :min="1" :max="1000" label="价格"></el-input-number>
+      </el-form-item>
+      <el-form-item label="预约时间">
+        <el-date-picker
+          v-model="editOrderInfo.appointmentTime"
+          type="datetime"
+          placeholder="选择预约时间">
+        </el-date-picker>
+      </el-form-item>
+    </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="hideDialog">取 消</el-button>
       <el-button type="primary" @click="editBrifeForm">确 定</el-button>
@@ -151,7 +167,7 @@ export default {
     showDialog: {
       type: Boolean
     },
-    // 表单类型 1 商户详情  2商户菜单添加 3用户评论  4菜单信息  5 菜单编辑
+    // 表单类型 1 商户详情  2商户菜单添加 3用户评论  4菜单信息  5 菜单编辑  6 用户修改订单信息
     formType: {
       type: Number
     },
@@ -171,6 +187,13 @@ export default {
     },
     // 用户评论餐厅
     userComment: {
+      type: Object,
+      default () {
+        return {}
+      }
+    },
+    // 用户修改订单信息
+    editOrderInfo: {
       type: Object,
       default () {
         return {}
@@ -215,7 +238,7 @@ export default {
   },
   methods: {
     hideDialog () {
-      this.$emit('toogleDialog', false)
+      this.$emit('hideDialog', false)
     },
 
     editBrifeForm () {
@@ -225,6 +248,8 @@ export default {
         this.addMenu()
       } else if (this.formType === 3) {
         this.addComment()
+      } else if (this.formType === 6) {
+        this.editOrder()
       }
     },
 
@@ -261,6 +286,23 @@ export default {
       return dateAfter
     },
 
+    // 编辑订单 /dining-menu-order/consumer/updateDiningMenuOrder?id=2&prize=1212&appointmentTime=
+    editOrder () {
+      this.$axios({
+        url: `/dining-menu-order/consumer/updateDiningMenuOrder?id=${this.editOrderInfo.id}&prize=${this.editOrderInfo.prize}&appointmentTime=${this.editOrderInfo.appointmentTime}`,
+        method: 'post'
+      }).then(res => {
+        if (res) {
+          this.$message.success(res.msg)
+          this.$emit('hideDialog')
+        } else {
+          this.$message.error(res.msg)
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+
     // 添加菜单 POST /dining-menu/merchant/addDiningRoom
     // 编辑菜单信息 /dining-menu/merchant/updateDiningRoom
     addMenu () {
@@ -292,7 +334,7 @@ export default {
         data: qs.stringify(this.userComment)
       }).then(res => {
         if (res) {
-          this.$message.success('您已成功评论')
+          this.$message.success(res.msg)
           this.$emit('hideDialog')
         } else {
           this.$message.error(res.msg)

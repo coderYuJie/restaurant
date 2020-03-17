@@ -5,6 +5,7 @@ import Login from '@/views/Login.vue'
 import diningDetail from '@/views/dining-detail.vue'
 import merchantDetail from '@/views/merchant-detail.vue'
 import Personal from '@/views/Personal.vue'
+import Order from '@/views/order.vue'
 import UserManagement from '@/views/UserManagement.vue'
 import Statistics from '../views/Statistics.vue'
 
@@ -46,6 +47,12 @@ const routes = [
     path: '/personal',
     name: 'Personal',
     component: Personal
+  },
+  // 用户-个人订单
+  {
+    path: '/Order',
+    name: 'Order',
+    component: Order
   },
   {
     path: '/userManagement',

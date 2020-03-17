@@ -13,7 +13,7 @@
           {{userData&&userData.name}}<i class="el-icon-caret-bottom el-icon--right"></i>
         </span>
         <el-dropdown-menu v-if="isPersonal" slot="dropdown">
-          <el-dropdown-item icon="el-icon-tickets">我的订单</el-dropdown-item>
+          <el-dropdown-item command="Order" icon="el-icon-tickets">我的订单</el-dropdown-item>
           <el-dropdown-item command="/personal" icon="el-icon-tickets">个人中心</el-dropdown-item>
           <el-dropdown-item command="logout" icon="el-icon-switch-button">退出</el-dropdown-item>
         </el-dropdown-menu>
