@@ -33,6 +33,9 @@ kai1819@qq.com  kaikai
 
 18599887744    admin
 
+## 用户类型
+
+* userType: 3——个人     2——商户   1——admin
 
 ## 已经使用过的接口
 

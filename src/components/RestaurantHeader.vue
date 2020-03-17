@@ -43,6 +43,14 @@ export default {
       userData: {}
     }
   },
+  watch: {
+    'userData.id': {
+      immediate: true,
+      handler (nv) {
+        nv && (this.$emit('getUserId', nv))
+      }
+    }
+  },
   methods: {
     async getUser () {
       try {

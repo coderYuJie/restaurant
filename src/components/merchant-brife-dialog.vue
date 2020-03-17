@@ -108,6 +108,29 @@
         <el-input type="textarea" v-model="menu.describe"></el-input>
       </el-form-item>
     </el-form>
+
+    <!-- 用户评论餐厅 userComment-->
+    <el-form
+      v-show="formType==3"
+      label-width="80px"
+      :model="userComment">
+      <el-form-item label="评分">
+        <el-input-number v-model="userComment.grade" :min="1" :max="10" label="评分"></el-input-number>
+      </el-form-item>
+      <el-form-item label="评论图片">
+        <el-upload
+          class="upload-demo"
+          action="http://www.kaico.site:1819/orderingmeals/common/upload"
+          :file-list="userComment.comment_pic">
+          <el-button size="small" type="primary">点击上传</el-button>
+          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+        </el-upload>
+      </el-form-item>
+      <el-form-item label="评论">
+        <el-input type="textarea" v-model="userComment.comment"></el-input>
+      </el-form-item>
+    </el-form>
+
     <span slot="footer" class="dialog-footer">
       <el-button @click="hideDialog">取 消</el-button>
       <el-button type="primary" @click="editBrifeForm">确 定</el-button>
@@ -145,7 +168,14 @@ export default {
       default () {
         return {}
       }
-    }
+    },
+    // 用户评论餐厅
+    userComment: {
+      type: Object,
+      default () {
+        return {}
+      }
+    },
   },
 
   data () {
@@ -193,6 +223,8 @@ export default {
         this.editResInfo()
       } else if (this.formType === 2 || this.formType === 5) {
         this.addMenu()
+      } else if (this.formType === 3) {
+        this.addComment()
       }
     },
 
@@ -244,6 +276,24 @@ export default {
           const msg = this.formType === 5 ? '菜单编辑成功' : '菜单添加成功'
           this.$message.success(msg)
           this.hideDialog()
+        } else {
+          this.$message.error(res.msg)
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+
+    // 用户添加评论 POST /dining-menu-comment/consumer/addDiningRoom
+    addComment () {
+      this.$axios({
+        url: '/dining-menu-comment/consumer/addDiningRoom',
+        method: 'post',
+        data: qs.stringify(this.userComment)
+      }).then(res => {
+        if (res) {
+          this.$message.success('您已成功评论')
+          this.$emit('hideDialog')
         } else {
           this.$message.error(res.msg)
         }

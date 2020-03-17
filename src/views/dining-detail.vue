@@ -1,7 +1,7 @@
 <template>
 <!-- 首页->商铺详情 -->
   <div class="dining-detail">
-    <restaurant-header></restaurant-header>
+    <restaurant-header @getUserId="getUserId"></restaurant-header>
     <div class="detail-wrapper header-bottom">
       <div class="brief-info">
         <div class="img">
@@ -26,31 +26,46 @@
       <div class="menu-wrapper">
         <div class="block-title">菜单详情</div>
         <template v-if="detailData && detailData.menuList && detailData.menuList.length ">
-          <img src="" alt="">
+          <div v-for="(val, key, idx) in detailData.menuList" :key="idx" class="menu-wrapper">
+            <img :src="val.greesPic" alt="商家图片">
+            <div class="info-wrapper">
+              <div class="item">
+                <span>{{val.greesName}}</span>
+                <span>单价：{{val.greesPrice}}</span>
+                <span>重量：{{val.gressContent}}</span>
+                <span>描述：{{val.describe}}</span>
+              </div>
+            </div>
+          </div>
         </template>
+        <span v-else>餐厅暂无菜单</span>
       </div>
       <div class="comment">
         <div class="block-title">网友点评</div>
-          <template v-if="detailData && detailData.DiningMenuComments && !detailData.DiningMenuComments.total">
-            暂无评论
-          </template>
-          <template v-if="detailData && detailData.DiningMenuComments && detailData.DiningMenuComments.records">
+          <template v-if="detailData && detailData.DiningMenuComments && detailData.DiningMenuComments.total">
             <div class="item" v-for="(val, idx) in detailData.DiningMenuComments.records" :key="idx">
               <div class="user-name">用户名： xxx  </div>
               <div class="user-grade">评分：{{val.grade}}</div>
+              <div class="user-grade">评论：{{val.comment}}</div>
               <img v-if="val.commentPic" :src="val.commentPic" alt="">
               <div class="tiem">评论时间：{{val.createTime}}</div>
               <h4>店家回复</h4>
               <div v-if="val.commentBack">{{val.commentBack}}</div>
-              <!-- <template v-else>
-                <el-input v-model="backCommentData[idx]" placeholder="请输入评论回复"></el-input>
-                <i class="el-icon-edit-outline" @click="backComment(val.id, idx)">商家回复</i>
-              </template> -->
+              <hr>
             </div>
           </template>
-
+          <span v-else>餐厅暂无评论</span>
+          <i class="el-icon-edit-outline" @click="discussDining">评论餐厅</i>
       </div>
     </div>
+
+    <form-dialog
+      dialogTitle="餐厅评论"
+      :showDialog="showDialog"
+      :formType="3"
+      :userComment="userComment"
+      @hideDialog="hideDialog">
+  </form-dialog>
   </div>
 </template>
 
@@ -59,11 +74,23 @@ import qs from 'qs'
 
 export default {
   name: 'diningDetail',
+  components: {
+    formDialog: () => import('@/components/merchant-brife-dialog')
+  },
   data () {
     return {
       // 餐厅详情
       detailData: {
-      }
+      },
+      showDialog: false,
+      userComment: {
+        userId: null, // 用户id
+        diningRoomId: null, // 餐厅id
+        grade: 0, // 评分
+        comment: '', // 评论内容
+        comment_pic: []
+      }, // 评论
+      userId: null
     }
   },
   computed: {
@@ -95,8 +122,22 @@ export default {
       }).catch(err => {
         console.log(err)
       })
-    }
+    },
 
+    getUserId (val) {
+      this.userId = val
+    },
+
+    discussDining () {
+      this.showDialog = true
+      this.userComment.userId = this.userId
+      this.userComment.diningRoomId = this.detailData.diningRoom.id
+    },
+
+    hideDialog () {
+      this.showDialog = false
+      this.getData(this.$route.query.id)
+    }
   }
 
 }
