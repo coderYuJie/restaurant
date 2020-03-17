@@ -6,15 +6,15 @@
       <div class="brief-info">
         <div class="block-title">
           简要信息
-          <i class="el-icon-edit-outline" @click="toogleDialog(true, 1)"></i>
+          <i class="el-icon-edit-outline" @click="toogleDialog(true, 1)">编辑</i>
         </div>
         <div class="block-content" v-if="merchantData && merchantData.diningRoom">
           <div class="wrapper">
-            <span class="name">头像：</span>
+            <span class="name">头像:</span>
             <img :src="merchantData.diningRoom.image" alt="">
           </div>
           <div v-for="(val, key, idx) in brifeInfo" :key="idx" class="wrapper">
-            <span class="name">{{val}}</span>
+            <span class="name">{{val}}:</span>
             {{merchantData.diningRoom[key] || '--'}}
           </div>
         </div>
@@ -22,11 +22,25 @@
       <div class="menu-info">
         <div class="block-title">
           菜单信息
-          <i class="el-icon-edit-outline" @click="toogleDialog(true, 2)"></i>
+          <i class="el-icon-circle-plus" @click="toogleDialog(true, 2)">添加</i>
         </div>
-        <div class="menu-wrapper">
+        <div class="block-content">
           <template v-if="merchantData && merchantData.menuList && merchantData.menuList.length">
-
+            <div v-for="(val, key, idx) in merchantData.menuList" :key="idx" class="menu-wrapper">
+              <img :src="val.greesPic" alt="商家图片">
+              <div class="info-wrapper">
+                <div class="item">
+                  <span>{{val.greesName}}</span>
+                  <span>单价：{{val.greesPrice}}</span>
+                  <span>重量：{{val.gressContent}}</span>
+                </div>
+                <div class="item">
+                  <span>描述：{{val.describe}}</span>
+                  <i class="el-icon-edit-outline" @click="editMenu(val)"></i>
+                  <i class="el-icon-delete" @click="deleteMenu(val.id)"></i>
+                </div>
+              </div>
+            </div>
           </template>
           <template v-else>
             暂无菜单信息
@@ -35,7 +49,7 @@
       </div>
       <div class="comment-info">
         <div class="block-title">顾客评论</div>
-        <div class="comment-wrapper">
+        <div class="block-content">
           <template v-if="merchantData && merchantData.DiningMenuComments && !merchantData.DiningMenuComments.total">
             暂无评论
           </template>
@@ -62,6 +76,7 @@
       :showDialog="showDialog"
       :formType="formType"
       :diningData="merchantData && merchantData.diningRoom"
+      :editMenuData="editMenuData"
       @toogleDialog="toogleDialog">
     </form-dialog>
   </div>
@@ -77,8 +92,8 @@ export default {
   },
   data () {
     return {
-      // 餐厅详情
-      merchantData: {},
+      merchantData: {}, // 餐厅详情
+      menuList: [], // 菜单详情
       page: {
         size: 10,
         current: 1
@@ -86,9 +101,7 @@ export default {
       brifeInfo: {
         name: '用户名',
         phone: '电话',
-        address: '地址',
         introduce: '简介',
-        detailedIntroduce: '详细介绍',
         startTime: '营业时间',
         endTime: '关门时间',
         type: '类型',
@@ -96,12 +109,15 @@ export default {
         lable: '标签',
         tables: '座位数',
         commentCount: '评论数',
-        consumePerCost: '人均消费'
+        consumePerCost: '人均消费',
+        address: '地址',
+        detailedIntroduce: '详细介绍'
       },
-      formType: 1, // 1 餐厅简要详情  2 菜单
+      formType: 1, // 1 餐厅简要详情  2 菜单添加  5 菜单编辑
       showDialog: false,
       dialogTitle: '商户详情表单',
       backCommentData: [], // 商家回复内容
+      editMenuData: {} // 当前编辑的菜单信息
     }
   },
   computed: {
@@ -163,6 +179,47 @@ export default {
       }).catch(err => {
         console.log(err)
       })
+    },
+    
+    // 商户查看菜单信息 GET /dining-menu/merchantAdmin/getDiningRoom/{id
+    // url: `/dining-menu/merchantAdmin/getDiningRoom/8`,
+    // getMenu () {
+    //   this.$axios({
+    //     url: `/dining-menu/merchantAdmin/getDiningRoom/{id}?id=${this.merchantData.diningRoom.id}`,
+    //     method: 'get'
+    //   }).then(res => {
+    //     if (res) {
+    //       this.menuList = res.data
+    //     } else {
+    //     }
+    //   }).catch(err => {
+    //     console.log(err)
+    //   })
+    // }
+
+    // 删除菜单信息 DELETE /dining-menu/merchant/deleteDiningRoom/{id}
+    deleteMenu (id) {
+      this.$axios({
+        url: `/dining-menu/merchant/deleteDiningRoom/${id}`,
+        method: 'DELETE'
+      }).then(res => {
+        if (res) {
+          this.$message.success('菜单删除成功')
+          this.getData()
+        } else {
+          this.$message.error(res.msg)
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+
+    // 编辑菜单信息
+    editMenu (val) {
+      this.formType = 5
+      this.dialogTitle = '菜单编辑'
+      this.editMenuData = val
+      this.showDialog = true
     }
   }
 
@@ -171,6 +228,37 @@ export default {
 
 <style lang="less" scoped>
 .merchant-detail .detail-wrapper {
-
+  .block-content {
+    padding: 20px 30px;
+  }
+  // 菜单信息
+  .menu-info .menu-wrapper {
+    display: flex;
+    margin-bottom: 20px;
+    img {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      background-color: rgb(214,201,201);
+      margin-right: 20px;
+    }
+    .info-wrapper {
+      position: relative;
+      .item {
+        span {
+          margin-right: 30px;
+        }
+      }
+      i {
+        cursor: pointer;
+        position: absolute;
+        right: 0;
+        color: #f03726;
+        &:last-child {
+          right: -30px;
+        }
+      }
+    }
+  }
 }
 </style>

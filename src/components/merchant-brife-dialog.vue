@@ -1,6 +1,7 @@
 <template>
   <!-- 商户-简要信息修改dialog  用户评论dialog-->
-  <el-dialog :title="dialogTitle" :visible="showDialog" width="600px" center>
+  <el-dialog :title="dialogTitle" :visible="showDialog" width="600px" center :before-close="hideDialog">
+    <!-- 修改餐厅信息 -->
     <el-form
       v-show="formType==1 && Object.keys(diningData).length"
       label-width="80px"
@@ -77,6 +78,36 @@
         <el-input-number v-model="diningData.consumePerCost" :min="1" :max="1000" label="人均消费"></el-input-number>
       </el-form-item>
     </el-form>
+
+    <!-- 添加一个菜单 -->
+    <el-form
+      v-show="formType==2 || formType==5"
+      label-width="80px"
+      :model="menu">
+      <el-form-item label="菜单名称">
+        <el-input v-model="menu.greesName"></el-input>
+      </el-form-item>
+      <el-form-item label="价格">
+        <el-input-number v-model="menu.greesPrice" :min="1" :max="1000" label="单价"></el-input-number>
+      </el-form-item>
+      <el-form-item label="菜单图片">
+        <img v-if="menu.greesPic" :src="menu.greesPic" alt="">
+        <el-upload
+          v-else
+          class="upload-demo"
+          action="http://www.kaico.site:1819/orderingmeals/common/upload"
+          :file-list="menu.greesPic">
+          <el-button size="small" type="primary">点击上传</el-button>
+          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+        </el-upload>
+      </el-form-item>
+      <el-form-item label="含量">
+        <el-input-number v-model="menu.gressContent" :min="1" :max="1000" label="含量"></el-input-number>
+      </el-form-item>
+      <el-form-item label="菜单描述">
+        <el-input type="textarea" v-model="menu.describe"></el-input>
+      </el-form-item>
+    </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="hideDialog">取 消</el-button>
       <el-button type="primary" @click="editBrifeForm">确 定</el-button>
@@ -97,12 +128,19 @@ export default {
     showDialog: {
       type: Boolean
     },
-    // 表单类型 1 商户详情  2商户菜单 3用户评论  4菜单信息
+    // 表单类型 1 商户详情  2商户菜单添加 3用户评论  4菜单信息  5 菜单编辑
     formType: {
       type: Number
     },
     // 商户详情数据
     diningData: {
+      type: Object,
+      default () {
+        return {}
+      }
+    },
+    // 编辑菜单信息
+    editMenuData: {
       type: Object,
       default () {
         return {}
@@ -116,13 +154,33 @@ export default {
       typeArr: ['中餐厅', '日料', '韩国寿司', '大排档', '烧烤'],
       tasteArr: ['麻辣', '鲜香', '清淡', '变态辣'],
       labelArr: ['聚会轰趴', '国宴大厨', '味道', '年会生日会'],
-      fileList: []
+      fileList: [],
+      menu: {
+        greesName: '', // 菜单名称
+        greesPrice: 0, // 价格
+        greesPic: [], // 图片路径 deku需要转换
+        gressContent: 0, // 菜单含量（单位：g）
+        describe: '' // 菜单描述
+      } // 单个菜单信息
     }
   },
   computed: {
 
   },
   watch: {
+    showDialog: {
+      handler (nv) {
+        if (nv) {
+          if (this.formType === 5) {
+            this.menu = JSON.parse(JSON.stringify(this.editMenuData))
+          } else {
+            Object.assign(this.$data.menu, this.$options.data().menu)
+          }
+
+        }
+      }
+    }
+
   },
   created () {
   },
@@ -131,8 +189,16 @@ export default {
       this.$emit('toogleDialog', false)
     },
 
-    // 编辑餐厅信息POST /dining-room/merchant/updateDiningRoom
     editBrifeForm () {
+      if (this.formType === 1) {
+        this.editResInfo()
+      } else if (this.formType === 2 || this.formType === 5) {
+        this.addMenu()
+      }
+    },
+
+    // 编辑餐厅信息POST /dining-room/merchant/updateDiningRoom
+    editResInfo () {
       const obj = JSON.parse(JSON.stringify(this.diningData))
       delete obj.gradeScore
       delete obj.commentCount
@@ -162,6 +228,29 @@ export default {
       const dateBefore = new Date(date)
       const dateAfter = dateBefore.getFullYear() + '-' + (dateBefore.getMonth() + 1) + '-' + dateBefore.getDate() + ' ' + dateBefore.getHours() + ':' + dateBefore.getMinutes() + ':' + dateBefore.getSeconds()
       return dateAfter
+    },
+
+    // 添加菜单 POST /dining-menu/merchant/addDiningRoom
+    // 编辑菜单信息 /dining-menu/merchant/updateDiningRoom
+    addMenu () {
+      let obj = JSON.parse(JSON.stringify(this.menu))
+      obj.greesPic = 'asdfasdf' // deku假路径
+      const url = this.formType === 5 ? '/dining-menu/merchant/updateDiningRoom' : '/dining-menu/merchant/addDiningRoom'
+      this.$axios({
+        url: url,
+        method: 'post',
+        data: qs.stringify(obj)
+      }).then(res => {
+        if (res) {
+          const msg = this.formType === 5 ? '菜单编辑成功' : '菜单添加成功'
+          this.$message.success(msg)
+          this.hideDialog()
+        } else {
+          this.$message.error(res.msg)
+        }
+      }).catch(err => {
+        console.log(err)
+      })
     }
   }
 
@@ -169,4 +258,5 @@ export default {
 </script>
 
 <style lang="less" scoped>
+
 </style>

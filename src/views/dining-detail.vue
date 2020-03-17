@@ -1,4 +1,5 @@
 <template>
+<!-- 首页->商铺详情 -->
   <div class="dining-detail">
     <restaurant-header></restaurant-header>
     <div class="detail-wrapper header-bottom">
@@ -62,7 +63,7 @@ export default {
     return {
       // 餐厅详情
       detailData: {
-      }
+      },
     }
   },
   computed: {
@@ -79,7 +80,6 @@ export default {
     }
   },
   created () {
-    // this.getData()
   },
   methods: {
     getData (id) {
@@ -96,6 +96,8 @@ export default {
         console.log(err)
       })
     }
+
+
   }
 
 }

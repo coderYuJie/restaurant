@@ -38,3 +38,7 @@ kai1819@qq.com  kaikai
 
 * POST /dining-room/merchant/getDiningRoom
 * POST /dining-room/merchant/updateDiningRoom
+
+## 接口bug
+
+* 商户个人主页图片需要再次处理
