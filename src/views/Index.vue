@@ -1,6 +1,6 @@
 <template>
   <div class="index">
-    <restaurant-header @search="handleSearch" :userData="userData"></restaurant-header>
+    <restaurant-header @search="handleSearch"></restaurant-header>
     <div class="index-main">
       <!-- 餐厅分类 -->
       <div class="restaurant-classify">
@@ -49,7 +49,6 @@ export default {
   name: 'Index',
   data () {
     return {
-      userData: null,
       search: {
         size: 5,
         current: 1,

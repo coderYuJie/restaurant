@@ -5,6 +5,7 @@ import Login from '@/views/Login.vue'
 import diningDetail from '@/views/dining-detail.vue'
 import Personal from '@/views/Personal.vue'
 import UserManagement from '@/views/UserManagement.vue'
+import Statistics from '../views/Statistics.vue'
 
 const originalPush = VueRouter.prototype.push
 VueRouter.prototype.push = function push (location) {
@@ -43,6 +44,11 @@ const routes = [
     path: '/userManagement',
     name: 'UserManagement',
     component: UserManagement
+  },
+  {
+    path: '/statistics',
+    name: 'Statistics',
+    component: Statistics
   }
 
   // {

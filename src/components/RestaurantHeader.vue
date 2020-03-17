@@ -2,7 +2,7 @@
 <div class="restaurant-header">
   <header class="index-header">
     <img @click="goHome" src="@/assets/img/logo.png" alt="中餐厅" class="logo">
-    <div v-if="!isLogin" class="search">
+    <div v-if="isShowSearch()" class="search">
       <el-input placeholder="请输入餐厅名" v-model="query">
       <el-button @click="handlerClick" slot="append">搜索</el-button>
     </el-input>
@@ -24,7 +24,7 @@
         </el-dropdown-menu>
         <el-dropdown-menu  v-if="isAdmin" slot="dropdown">
           <el-dropdown-item command="/userManagement" icon="el-icon-tickets">用户管理</el-dropdown-item>
-          <el-dropdown-item icon="el-icon-tickets">平台数据</el-dropdown-item>
+          <el-dropdown-item command="/statistics" icon="el-icon-tickets">平台数据</el-dropdown-item>
           <el-dropdown-item command="logout" icon="el-icon-switch-button">退出</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -87,6 +87,17 @@ export default {
         }
       } catch (e) {
         console.log(e)
+      }
+    },
+    isShowSearch () {
+      if (this.$route.path === '/login') {
+        return false
+      } else if (this.$route.path === '/userManagement') {
+        return false
+      } else if (this.$route.path === '/statistics') {
+        return false
+      } else {
+        return true
       }
     }
   },
