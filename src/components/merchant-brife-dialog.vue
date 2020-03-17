@@ -147,6 +147,23 @@
         </el-date-picker>
       </el-form-item>
     </el-form>
+
+    <!-- 用户预约菜单 -->
+    <el-form
+      v-show="formType==7"
+      label-width="80px"
+      :model="editOrderInfo">
+      <el-form-item label="预约时间">
+        <el-date-picker
+          v-model="editOrderInfo.appointmentTime"
+          type="datetime"
+          placeholder="选择预约时间">
+        </el-date-picker>
+      </el-form-item>
+      <el-form-item label="价格">
+        <!-- deku这边要用多选框写 后续需要和上面的修改订单信息进行集成 -->
+      </el-form-item>
+    </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="hideDialog">取 消</el-button>
       <el-button type="primary" @click="editBrifeForm">确 定</el-button>
@@ -167,7 +184,7 @@ export default {
     showDialog: {
       type: Boolean
     },
-    // 表单类型 1 商户详情  2商户菜单添加 3用户评论  4菜单信息  5 菜单编辑  6 用户修改订单信息
+    // 表单类型 1 商户详情  2商户菜单添加 3用户评论  4菜单信息  5 菜单编辑  6 用户修改订单信息  7 预约菜单
     formType: {
       type: Number
     },
@@ -196,9 +213,17 @@ export default {
     editOrderInfo: {
       type: Object,
       default () {
-        return {}
+        return []
       }
     },
+
+    // 用户预约餐厅菜单
+    orderRest: {
+      type: Object,
+      default () {
+        return {}
+      }
+    }
   },
 
   data () {

@@ -20,7 +20,7 @@
           <div class="item"><span>时间：</span>{{diningRoomData && diningRoomData.phone || "--"}}</div>
           <div class="item"><span>剩余餐位：</span>{{lastTables}}</div>
           <!--  -->
-          <div class="order-btn item">立即预约</div>
+          <div class="order-btn item" @click="order">立即预约</div>
         </div>
       </div>
       <div class="menu-wrapper">
@@ -60,10 +60,11 @@
     </div>
 
     <form-dialog
-      dialogTitle="餐厅评论"
+      :dialogTitle="formType==3?'餐厅评论':'预约餐厅'"
       :showDialog="showDialog"
-      :formType="3"
+      :formType="formType"
       :userComment="userComment"
+      :orderRest="detailData.menuList"
       @hideDialog="hideDialog">
   </form-dialog>
   </div>
@@ -91,7 +92,8 @@ export default {
         comment_pic: []
       }, // 评论
       userId: null,
-      lastTables: null // 剩余餐位
+      lastTables: null, // 剩余餐位
+      formType: null,
     }
   },
   computed: {
@@ -135,8 +137,18 @@ export default {
 
     discussDining () {
       this.showDialog = true
+      this.formType = 3
       this.userComment.userId = this.userId
       this.userComment.diningRoomId = this.detailData.diningRoom.id
+    },
+
+    order () {
+      if (this.detailData.menuList.length) {
+        this.showDialog = true
+        this.formType = 7
+      } else {
+        this.$message.warning('该餐厅暂无菜单！')
+      }
     },
 
     hideDialog () {
