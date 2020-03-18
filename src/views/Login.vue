@@ -238,6 +238,7 @@ export default {
 
   .login-main {
     position: relative;
+    margin-top: 80px;
     /deep/ .el-form--label-top .el-form-item__label {
         padding: 0;
     }

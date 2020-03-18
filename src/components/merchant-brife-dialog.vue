@@ -193,7 +193,7 @@ export default {
     showDialog: {
       type: Boolean
     },
-    // 表单类型 1 商户详情  2商户菜单添加 3用户评论  4菜单信息  5 菜单编辑
+    // 表单类型 1 商户详情  2商户菜单添加 3用户评论  4菜单信息  5 菜单编辑  6 用户修改订单信息  7 预约菜单
     formType: {
       type: Number
     },
@@ -281,7 +281,6 @@ export default {
           } else {
             Object.assign(this.$data.menu, this.$options.data().menu)
           }
-
         }
       }
     }
@@ -341,10 +340,27 @@ export default {
       return dateAfter
     },
 
+    // 编辑订单 /dining-menu-order/consumer/updateDiningMenuOrder?id=2&prize=1212&appointmentTime=
+    editOrder () {
+      this.$axios({
+        url: `/dining-menu-order/consumer/updateDiningMenuOrder?id=${this.editOrderInfo.id}&prize=${this.editOrderInfo.prize}&appointmentTime=${this.editOrderInfo.appointmentTime}`,
+        method: 'post'
+      }).then(res => {
+        if (res) {
+          this.$message.success(res.msg)
+          this.$emit('hideDialog')
+        } else {
+          this.$message.error(res.msg)
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+
     // 添加菜单 POST /dining-menu/merchant/addDiningRoom
     // 编辑菜单信息 /dining-menu/merchant/updateDiningRoom
     addMenu () {
-      let obj = JSON.parse(JSON.stringify(this.menu))
+      const obj = JSON.parse(JSON.stringify(this.menu))
       obj.greesPic = 'asdfasdf' // deku假路径
       const url = this.formType === 5 ? '/dining-menu/merchant/updateDiningRoom' : '/dining-menu/merchant/addDiningRoom'
       this.$axios({

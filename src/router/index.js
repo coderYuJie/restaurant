@@ -5,7 +5,9 @@ import Login from '@/views/Login.vue'
 import diningDetail from '@/views/dining-detail.vue'
 import merchantDetail from '@/views/merchant-detail.vue'
 import Personal from '@/views/Personal.vue'
+import Order from '@/views/order.vue'
 import UserManagement from '@/views/UserManagement.vue'
+import Statistics from '../views/Statistics.vue'
 
 const originalPush = VueRouter.prototype.push
 VueRouter.prototype.push = function push (location) {
@@ -46,10 +48,21 @@ const routes = [
     name: 'Personal',
     component: Personal
   },
+  // 用户-个人订单
+  {
+    path: '/Order',
+    name: 'Order',
+    component: Order
+  },
   {
     path: '/userManagement',
     name: 'UserManagement',
     component: UserManagement
+  },
+  {
+    path: '/statistics',
+    name: 'Statistics',
+    component: Statistics
   }
 
   // {

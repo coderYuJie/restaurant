@@ -2,7 +2,7 @@
 <div class="restaurant-header">
   <header class="index-header">
     <img @click="goHome" src="@/assets/img/logo.png" alt="中餐厅" class="logo">
-    <div v-if="!isLogin" class="search">
+    <div v-if="isShowSearch()" class="search">
       <el-input placeholder="请输入餐厅名" v-model="query">
       <el-button @click="handlerClick" slot="append">搜索</el-button>
     </el-input>
@@ -13,7 +13,7 @@
           {{userData&&userData.name}}<i class="el-icon-caret-bottom el-icon--right"></i>
         </span>
         <el-dropdown-menu v-if="isPersonal" slot="dropdown">
-          <el-dropdown-item icon="el-icon-tickets">我的订单</el-dropdown-item>
+          <el-dropdown-item command="Order" icon="el-icon-tickets">我的订单</el-dropdown-item>
           <el-dropdown-item command="/personal" icon="el-icon-tickets">个人中心</el-dropdown-item>
           <el-dropdown-item command="logout" icon="el-icon-switch-button">退出</el-dropdown-item>
         </el-dropdown-menu>
@@ -24,7 +24,7 @@
         </el-dropdown-menu>
         <el-dropdown-menu  v-if="isAdmin" slot="dropdown">
           <el-dropdown-item command="/userManagement" icon="el-icon-tickets">用户管理</el-dropdown-item>
-          <el-dropdown-item icon="el-icon-tickets">平台数据</el-dropdown-item>
+          <el-dropdown-item command="/statistics" icon="el-icon-tickets">平台数据</el-dropdown-item>
           <el-dropdown-item command="logout" icon="el-icon-switch-button">退出</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -41,6 +41,14 @@ export default {
     return {
       query: '',
       userData: {}
+    }
+  },
+  watch: {
+    'userData.id': {
+      immediate: true,
+      handler (nv) {
+        nv && (this.$emit('getUserId', nv))
+      }
     }
   },
   methods: {
@@ -87,6 +95,17 @@ export default {
         }
       } catch (e) {
         console.log(e)
+      }
+    },
+    isShowSearch () {
+      if (this.$route.path === '/login') {
+        return false
+      } else if (this.$route.path === '/userManagement') {
+        return false
+      } else if (this.$route.path === '/statistics') {
+        return false
+      } else {
+        return true
       }
     }
   },
