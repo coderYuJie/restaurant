@@ -47,6 +47,7 @@
               label="操作">
               <template v-slot:default="obj">
                 <el-button @click="delUser(obj.row.id)" type="danger" size="small" plain icon="el-icon-delete"></el-button>
+                <el-button @click="isShowEditUserDialog(obj.row)" type="primary" size="small" plain icon="el-icon-edit"></el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -99,6 +100,7 @@
               label="操作">
               <template v-slot:default="obj">
                 <el-button @click="delUser(obj.row.id)" type="danger" size="small" plain icon="el-icon-delete"></el-button>
+                <el-button @click="isShowEditUserDialog(obj.row)" type="primary" size="small" plain icon="el-icon-edit"></el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -148,6 +150,43 @@
         <span slot="footer" class="dialog-footer">
           <el-button @click="addUserDialogVisible = false">取 消</el-button>
           <el-button type="primary" @click="addUser">确 定</el-button>
+        </span>
+      </el-dialog>
+
+      <!-- 编辑用户对话框 -->
+      <el-dialog
+        title="修改用户"
+        :visible.sync="editUserDialogVisible"
+        width="40%">
+        <el-form :model="editForm" :rules="editRules" ref="editForm" label-width="80px">
+          <el-form-item label="类型">
+            <el-radio v-model="editForm.userType" label="3">个人</el-radio>
+            <el-radio v-model="editForm.userType" label="2">商家</el-radio>
+          </el-form-item>
+          <el-form-item label="头像">
+            <template v-for="(val, key) in imgSrcs">
+              <img :src="val" :key="key" :class="{'is-active': editForm.headImage == key}" @click="changeEditHead(key)" alt="">
+            </template>
+          </el-form-item>
+          <el-form-item label="昵称" prop="name">
+            <el-input v-model="editForm.name" placeholder="请输入昵称"></el-input>
+          </el-form-item>
+          <el-form-item label="手机号" prop="phone">
+            <el-input v-model="editForm.phone" placeholder="请输入手机号"></el-input>
+          </el-form-item>
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="editForm.email" placeholder="请输入邮箱"></el-input>
+          </el-form-item>
+          <el-form-item label="新密码" prop="newPassword">
+            <el-input v-model="editForm.newPassword" type="password" placeholder="请输入密码"></el-input>
+          </el-form-item>
+          <el-form-item label="确认密码" prop="confirm">
+            <el-input v-model="editForm.confirm" type="password" placeholder="请确认密码"></el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="editUserDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="editUser">确 定</el-button>
         </span>
       </el-dialog>
     </div>
@@ -201,6 +240,15 @@ export default {
         callback()
       }
     }
+    const verifyEditConfirm = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('请确认密码'))
+      } else if (this.editForm.newPassword !== value) {
+        callback(new Error('请确认两次输入的密码一致'))
+      } else {
+        callback()
+      }
+    }
     return {
       activeName: 'user',
       sendUserData: {
@@ -220,6 +268,7 @@ export default {
         businessTotal: 0
       },
       addUserDialogVisible: false,
+      editUserDialogVisible: false,
       addUserForm: {
         userType: '3',
         name: '',
@@ -251,6 +300,33 @@ export default {
         confirm: [
           { required: true, validator: verifyConfirm, trigger: 'blur' }
         ]
+      },
+      editForm: {
+        id: 0,
+        name: '',
+        newPassword: '',
+        email: '',
+        phone: '',
+        userType: 0,
+        headImage: '',
+        confirm: ''
+      },
+      editRules: {
+        name: [
+          { required: true, message: '请输入用户昵称', trigger: 'blur' }
+        ],
+        email: [
+          { required: true, validator: verifyEmail, trigger: 'blur' }
+        ],
+        phone: [
+          { required: true, validator: verifyPhone, trigger: 'blur' }
+        ],
+        newPassword: [
+          { validator: verifyPassword, trigger: 'blur' }
+        ],
+        confirm: [
+          { validator: verifyEditConfirm, trigger: 'blur' }
+        ]
       }
     }
   },
@@ -276,8 +352,6 @@ export default {
     async getBusinessList () {
       try {
         const res = await this.$axios.post('/sysUser/admin/getUserList', qs.stringify(this.sendBusinessData))
-        console.log(res)
-
         if (res.code === 0) {
           res.data.records.forEach(item => {
             item.status === 1 ? item.status = true : item.status = false
@@ -293,7 +367,6 @@ export default {
     },
     // 设置用户状态
     async setStatus (id, val) {
-      console.log(val, Number(val))
       try {
         if (!val) {
           const res = await this.$axios.get(`/sysUser/admin/lock/${id}`)
@@ -358,6 +431,18 @@ export default {
     changeHead (key) {
       this.addUserForm.headImage = key
     },
+    changeEditHead (key) {
+      this.editForm.headImage = key
+    },
+    isShowEditUserDialog (row) {
+      this.editUserDialogVisible = true
+      this.editForm.id = row.id
+      this.editForm.name = row.name
+      this.editForm.email = row.email
+      this.editForm.phone = row.phone
+      this.editForm.userType = row.userType + ''
+      this.editForm.headImage = row.headImage[row.headImage.length - 1]
+    },
     // 添加用户
     async addUser () {
       try {
@@ -388,6 +473,31 @@ export default {
     },
     clearAddForm () {
       this.$refs.addUserForm.resetFields()
+    },
+    // 修改用户信息
+    async editUser () {
+      try {
+        await this.$refs.editForm.validate()
+        const res = await this.$axios.post('/sysUser/updateUserInfo', qs.stringify({
+          id: this.editForm.id,
+          name: this.editForm.name,
+          password: this.editForm.newPassword,
+          email: this.editForm.email,
+          phone: this.editForm.phone,
+          userType: Number(this.editForm.userType),
+          headImage: this.editForm.headImage
+        }))
+        if (res.code === 0) {
+          this.$message.success('修改成功')
+          this.getUserList()
+          this.getBusinessList()
+          this.editUserDialogVisible = false
+        } else {
+          this.$message.error(res.msg)
+        }
+      } catch (e) {
+        console.log(e)
+      }
     }
   },
   created () {

@@ -2,10 +2,6 @@
   <div class="index">
     <restaurant-header @search="handleSearch"></restaurant-header>
     <div class="index-main">
-      <!-- 餐厅分类 -->
-      <div class="restaurant-classify">
-
-      </div>
 
       <!-- 餐厅展示列表 -->
       <ul class="restaurant-list">
