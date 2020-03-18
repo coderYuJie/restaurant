@@ -5,23 +5,21 @@
 
       <!-- 餐厅展示列表 -->
       <ul class="restaurant-list">
-        <li v-for="item in restaurantList" :key="item.id" class="restaurant-item" @click="skipDetail(item.id)">
+        <li v-for="item in restaurantList" :key="item.id" class="restaurant-item">
           <img src="@/assets/img/restaurant.png" alt="">
           <div class="item-main">
             <div class="item-tit">{{item.name}}</div>
             <div class="item-info">
-              <span>口味:{{item.tatste}}</span>
-              <span>人均:{{item.consumePerCost}}</span>
-              <span>评分:{{item.gradeScore}}</span>
-              <span>评论:{{item.commentCount}}</span>
+              <span>口味:{{item.tatste || '-'}}</span>
+              <span>人均:{{item.consumePerCost || '-'}}</span>
+              <span>评分:{{item.gradeScore || '-'}}</span>
+              <span>评论:{{item.commentCount || '-'}}</span>
             </div>
             <div class="tag">
               标签：
-              <span>{{item.label}}</span>
-              <span>火锅/干锅</span>
-              <span>特色口味</span>
+              <span>{{item.label || '-'}}</span>
             </div>
-            <div class="reservation"></div>
+            <div class="order-btn" @click="skipDetail(item.id)">立即预约</div>
           </div>
           <div class="hot"></div>
         </li>
@@ -111,7 +109,11 @@ export default {
         padding: 10px 30px;
         border: 1px solid #ccc;
         box-sizing: border-box;
-        margin: 5px auto;
+        margin: 5px auto 20px;
+        &:hover {
+          border-color: rgb(255,85,1);
+          box-shadow: 1px 2px 3px rgb(255,85,1,0.6);
+        }
 
         img {
           height: 140px;

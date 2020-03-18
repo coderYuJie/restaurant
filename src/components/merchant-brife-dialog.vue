@@ -291,6 +291,7 @@ export default {
   methods: {
     hideDialog () {
       this.$emit('toogleDialog', false)
+      this.$emit('hideDialog', false)
     },
 
     editBrifeForm () {
@@ -389,7 +390,7 @@ export default {
       }).then(res => {
         if (res) {
           this.$message.success(res.msg)
-          this.$emit('hideDialog')
+          this.hideDialog()
         } else {
           this.$message.error(res.msg)
         }
@@ -401,7 +402,7 @@ export default {
     // 用户添加订单 POST /dining-menu-order/consumer/addDiningMenuOrder
     addNewOlder () {
       const obj = {
-        diningRoomId: this.resId ,
+        diningRoomId: this.resId,
         prize: this.sumOlder,
         appointmentTime: this.dateConvert(this.newOlder.appointmentTime)
       }

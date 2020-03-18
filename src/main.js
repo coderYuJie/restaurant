@@ -8,6 +8,8 @@ import RestaurantHeader from './components/RestaurantHeader.vue'
 
 // 引入重置css样式
 import '@/assets/less/common.less'
+import '@/assets/less/element-trans.less'
+
 // 添加请求拦截器
 axios.interceptors.request.use(config => {
   // 在发送请求之前做些什么

@@ -10,6 +10,7 @@
     <div v-if="!isLogin" class="user">
       <el-dropdown @command="handleCommand">
         <span class="el-dropdown-link">
+          <img :src="headImgUrl"  class="head-logo">
           {{userData&&userData.name}}<i class="el-icon-caret-bottom el-icon--right"></i>
         </span>
         <el-dropdown-menu v-if="isPersonal" slot="dropdown">
@@ -19,7 +20,6 @@
         </el-dropdown-menu>
         <el-dropdown-menu v-if="isBusiness" slot="dropdown">
           <el-dropdown-item command="/merchant-detail" icon="el-icon-tickets">我的餐厅</el-dropdown-item>
-          <el-dropdown-item icon="el-icon-tickets">收益数据</el-dropdown-item>
           <el-dropdown-item command="logout" icon="el-icon-switch-button">退出</el-dropdown-item>
         </el-dropdown-menu>
         <el-dropdown-menu  v-if="isAdmin" slot="dropdown">
@@ -121,6 +121,13 @@ export default {
     },
     isAdmin () {
       return this.userData && this.userData.userType === 1
+    },
+    headImgUrl () {
+      let name = 'a'
+      if (this.userData && ['a', 'b', 'c', 'd'].includes(this.userData.headImage)) {
+        name = this.userData.headImage
+      }
+      return require(`@/assets/img/${name}.png`)
     }
   },
   created () {
@@ -135,6 +142,7 @@ export default {
   width: 100%;
   top: 0;
   background-color: #fff;
+  z-index: 10;
   .index-header {
     display: flex;
     height: 80px;
@@ -142,7 +150,14 @@ export default {
     align-items: center;
     padding: 0 30px;
     border-bottom: 1px solid #ccc;
-
+    img {
+      height: 40px;
+      &.head-logo{
+        border-radius: 20px;
+        position: relative;
+        top: 12px;
+      }
+    }
     .search {
       width: 500px;
 
