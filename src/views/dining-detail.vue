@@ -51,6 +51,16 @@
 
       </div>
     </div>
+    
+    <form-dialog
+      :dialogTitle="formType==3?'餐厅评论':'预约餐厅'"
+      :showDialog="showDialog"
+      :formType="formType"
+      :userComment="userComment"
+      :resId="detailData && detailData.diningRoom && detailData.diningRoom.id"
+      :orderRest="detailData && detailData.menuList"
+      @hideDialog="hideDialog">
+  </form-dialog>
   </div>
 </template>
 

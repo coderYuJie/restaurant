@@ -108,6 +108,71 @@
         <el-input type="textarea" v-model="menu.describe"></el-input>
       </el-form-item>
     </el-form>
+
+    <!-- 用户评论餐厅 userComment-->
+    <el-form
+      v-show="formType==3"
+      label-width="80px"
+      :model="userComment">
+      <el-form-item label="评分">
+        <el-input-number v-model="userComment.grade" :min="1" :max="10" label="评分"></el-input-number>
+      </el-form-item>
+      <el-form-item label="评论图片">
+        <el-upload
+          class="upload-demo"
+          action="http://www.kaico.site:1819/orderingmeals/common/upload"
+          :file-list="userComment.comment_pic">
+          <el-button size="small" type="primary">点击上传</el-button>
+          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+        </el-upload>
+      </el-form-item>
+      <el-form-item label="评论">
+        <el-input type="textarea" v-model="userComment.comment"></el-input>
+      </el-form-item>
+    </el-form>
+
+    <!-- 用户修改订单信息 deku有bug -->
+    <el-form
+      v-show="formType==6"
+      label-width="80px"
+      :model="editOrderInfo">
+      <el-form-item label="价格">
+        <el-input-number v-model="editOrderInfo.prize" :min="1" :max="1000" label="价格"></el-input-number>
+      </el-form-item>
+      <el-form-item label="预约时间">
+        <el-date-picker
+          v-model="editOrderInfo.appointmentTime"
+          type="datetime"
+          placeholder="选择预约时间">
+        </el-date-picker>
+      </el-form-item>
+    </el-form>
+
+    <!-- 用户预约菜单 -->
+    <el-form
+      v-show="formType==7"
+      label-width="80px"
+      :model="newOlder">
+      <el-form-item label="预约时间">
+        <el-date-picker
+          v-model="newOlder.appointmentTime"
+          type="datetime"
+          placeholder="选择预约时间">
+        </el-date-picker>
+      </el-form-item>
+      <el-form-item label="选择菜品">
+        <el-checkbox-group v-model="newOlder.orderList">
+          <el-checkbox v-for="(val, idx) in orderRest"
+            :key="idx"
+            :label="idx + '-' + val.greesPrice">
+            {{val.greesName}}
+          </el-checkbox>
+        </el-checkbox-group>
+      </el-form-item>
+      <el-form-item label="订单金额">
+        {{sumOlder}}
+      </el-form-item>
+    </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="hideDialog">取 消</el-button>
       <el-button type="primary" @click="editBrifeForm">确 定</el-button>
@@ -145,6 +210,33 @@ export default {
       default () {
         return {}
       }
+    },
+    // 用户评论餐厅
+    userComment: {
+      type: Object,
+      default () {
+        return {}
+      }
+    },
+    // 用户修改订单信息
+    editOrderInfo: {
+      type: Object,
+      default () {
+        return {}
+      }
+    },
+
+    // 用户预约餐厅菜单  type 7
+    orderRest: {
+      type: Array,
+      default () {
+        return []
+      }
+    },
+
+    // 餐厅id
+    resId: {
+      type: Number
     }
   },
 
@@ -161,11 +253,24 @@ export default {
         greesPic: [], // 图片路径 deku需要转换
         gressContent: 0, // 菜单含量（单位：g）
         describe: '' // 菜单描述
-      } // 单个菜单信息
+      }, // 单个菜单信息
+      newOlder: {
+        appointmentTime: null, // 预约时间
+        orderList: []
+      }
     }
   },
   computed: {
-
+    sumOlder () {
+      let sum = 0
+      if (this.newOlder.orderList.length) {
+        const arr = this.newOlder.orderList.map(i => Number(i.split('-')[1]))
+        sum = arr.reduce((prev, current, index, arr) => {
+          return prev + current
+        })
+      }
+      return sum
+    }
   },
   watch: {
     showDialog: {
@@ -194,6 +299,12 @@ export default {
         this.editResInfo()
       } else if (this.formType === 2 || this.formType === 5) {
         this.addMenu()
+      } else if (this.formType === 3) {
+        this.addComment()
+      } else if (this.formType === 6) {
+        this.editOrder()
+      } else if (this.formType === 7) {
+        this.addNewOlder()
       }
     },
 
@@ -251,7 +362,49 @@ export default {
       }).catch(err => {
         console.log(err)
       })
-    }
+    },
+
+    // 用户添加评论 POST /dining-menu-comment/consumer/addDiningRoom
+    addComment () {
+      this.$axios({
+        url: '/dining-menu-comment/consumer/addDiningRoom',
+        method: 'post',
+        data: qs.stringify(this.userComment)
+      }).then(res => {
+        if (res) {
+          this.$message.success(res.msg)
+          this.$emit('hideDialog')
+        } else {
+          this.$message.error(res.msg)
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+
+    // 用户添加订单 POST /dining-menu-order/consumer/addDiningMenuOrder
+    addNewOlder () {
+      const obj = {
+        diningRoomId: this.resId ,
+        prize: this.sumOlder,
+        appointmentTime: this.dateConvert(this.newOlder.appointmentTime)
+      }
+
+      this.$axios({
+        url: '/dining-menu-order/consumer/addDiningMenuOrder',
+        method: 'post',
+        data: qs.stringify(obj)
+      }).then(res => {
+        if (res) {
+          this.$message.success(res.msg)
+          this.$emit('hideDialog')
+        } else {
+          this.$message.error(res.msg)
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    },
   }
 
 }
