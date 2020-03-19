@@ -161,7 +161,7 @@ export default {
     hideDialog () {
       this.showDialog = false
       this.getData()
-    },
+    }
   }
 }
 </script>
