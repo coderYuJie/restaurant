@@ -157,10 +157,10 @@ export default {
         ]
       },
       imgSrcs: {
-        a: 'static/a.jpg',
-        b: 'static/b.jpeg',
-        c: 'static/c.jpg',
-        d: 'static/d.jpeg'
+        a: 'static/a.png',
+        b: 'static/b.png',
+        c: 'static/c.png',
+        d: 'static/d.png'
       }
     }
   },

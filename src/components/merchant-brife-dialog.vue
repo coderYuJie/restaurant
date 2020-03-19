@@ -152,16 +152,25 @@
     <el-form
       v-show="formType==7"
       label-width="80px"
-      :model="editOrderInfo">
+      :model="newOlder">
       <el-form-item label="预约时间">
         <el-date-picker
-          v-model="editOrderInfo.appointmentTime"
+          v-model="newOlder.appointmentTime"
           type="datetime"
           placeholder="选择预约时间">
         </el-date-picker>
       </el-form-item>
-      <el-form-item label="价格">
-        <!-- deku这边要用多选框写 后续需要和上面的修改订单信息进行集成 -->
+      <el-form-item label="选择菜品">
+        <el-checkbox-group v-model="newOlder.orderList">
+          <el-checkbox v-for="(val, idx) in orderRest"
+            :key="idx"
+            :label="idx + '-' + val.greesPrice">
+            {{val.greesName}}
+          </el-checkbox>
+        </el-checkbox-group>
+      </el-form-item>
+      <el-form-item label="订单金额">
+        {{sumOlder}}
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -213,16 +222,21 @@ export default {
     editOrderInfo: {
       type: Object,
       default () {
+        return {}
+      }
+    },
+
+    // 用户预约餐厅菜单  type 7
+    orderRest: {
+      type: Array,
+      default () {
         return []
       }
     },
 
-    // 用户预约餐厅菜单
-    orderRest: {
-      type: Object,
-      default () {
-        return {}
-      }
+    // 餐厅id
+    resId: {
+      type: Number
     }
   },
 
@@ -239,11 +253,24 @@ export default {
         greesPic: [], // 图片路径 deku需要转换
         gressContent: 0, // 菜单含量（单位：g）
         describe: '' // 菜单描述
-      } // 单个菜单信息
+      }, // 单个菜单信息
+      newOlder: {
+        appointmentTime: null, // 预约时间
+        orderList: []
+      }
     }
   },
   computed: {
-
+    sumOlder () {
+      let sum = 0
+      if (this.newOlder.orderList.length) {
+        const arr = this.newOlder.orderList.map(i => Number(i.split('-')[1]))
+        sum = arr.reduce((prev, current, index, arr) => {
+          return prev + current
+        })
+      }
+      return sum
+    }
   },
   watch: {
     showDialog: {
@@ -263,6 +290,7 @@ export default {
   },
   methods: {
     hideDialog () {
+      this.$emit('toogleDialog', false)
       this.$emit('hideDialog', false)
     },
 
@@ -275,6 +303,8 @@ export default {
         this.addComment()
       } else if (this.formType === 6) {
         this.editOrder()
+      } else if (this.formType === 7) {
+        this.addNewOlder()
       }
     },
 
@@ -360,6 +390,30 @@ export default {
       }).then(res => {
         if (res) {
           this.$message.success(res.msg)
+          this.hideDialog()
+        } else {
+          this.$message.error(res.msg)
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+
+    // 用户添加订单 POST /dining-menu-order/consumer/addDiningMenuOrder
+    addNewOlder () {
+      const obj = {
+        diningRoomId: this.resId,
+        prize: this.sumOlder,
+        appointmentTime: this.dateConvert(this.newOlder.appointmentTime)
+      }
+
+      this.$axios({
+        url: '/dining-menu-order/consumer/addDiningMenuOrder',
+        method: 'post',
+        data: qs.stringify(obj)
+      }).then(res => {
+        if (res) {
+          this.$message.success(res.msg)
           this.$emit('hideDialog')
         } else {
           this.$message.error(res.msg)
@@ -367,7 +421,7 @@ export default {
       }).catch(err => {
         console.log(err)
       })
-    }
+    },
   }
 
 }

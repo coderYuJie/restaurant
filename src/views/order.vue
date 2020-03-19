@@ -28,12 +28,15 @@
           prop="isPay"
           width="120"
           label="是否支付">
+          <template v-slot:default="obj">
+            {{obj.row.isPay ? '已支付' : '未支付'}}
+          </template>
         </el-table-column>
         <el-table-column
           label="操作">
           <template v-slot:default="obj">
             <el-button @click="deleteOrder(obj.row.id)" type="danger" size="small" plain icon="el-icon-delete"></el-button>
-            <el-button @click="payOlder(obj.row.id)" size="small" plain icon="el-icon-coin"></el-button>
+            <el-button @click="payOlder(obj.row.id, obj.row.prize)" size="small" plain icon="el-icon-coin"></el-button>
             <el-button @click="editOlder(obj.row)" size="small" plain icon="el-icon-edit-outline"></el-button>
           </template>
         </el-table-column>
@@ -132,10 +135,9 @@ export default {
     },
 
     // 付款 完成订单 POST /dining-menu-order/consumer/pay?id=2&price=15.00
-    payOlder (id) {
-      const price = 12 // deku 金额是假数据
+    payOlder (id, pay) {
       this.$axios({
-        url: `/dining-menu-order/consumer/pay?id=${id}&price=${price}`,
+        url: `/dining-menu-order/consumer/pay?id=${id}&price=${pay}`,
         method: 'POST'
       }).then(res => {
         if (res) {

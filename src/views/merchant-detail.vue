@@ -180,7 +180,7 @@ export default {
         console.log(err)
       })
     },
-
+    
     // 商户查看菜单信息 GET /dining-menu/merchantAdmin/getDiningRoom/{id
     // url: `/dining-menu/merchantAdmin/getDiningRoom/8`,
     // getMenu () {
