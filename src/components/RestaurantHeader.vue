@@ -98,14 +98,10 @@ export default {
       }
     },
     isShowSearch () {
-      if (this.$route.path === '/login') {
-        return false
-      } else if (this.$route.path === '/userManagement') {
-        return false
-      } else if (this.$route.path === '/statistics') {
-        return false
-      } else {
+      if (this.$route.path === '/index') {
         return true
+      } else {
+        return false
       }
     }
   },
