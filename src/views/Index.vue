@@ -6,7 +6,10 @@
       <!-- 餐厅展示列表 -->
       <ul class="restaurant-list">
         <li v-for="item in restaurantList" :key="item.id" class="restaurant-item">
-          <img src="@/assets/img/restaurant.png" alt="">
+          <img v-if="!item.image" src="@/assets/img/restaurant.png" alt="">
+          <div v-else class="res-img">
+            <img :src="item.image" alt="餐厅图片">
+          </div>
           <div class="item-main">
             <div class="item-tit">{{item.name}}</div>
             <div class="item-info">
@@ -21,7 +24,7 @@
             </div>
             <div class="order-btn" @click="skipDetail(item.id)">立即预约</div>
           </div>
-          <div class="hot"></div>
+          <div v-if="item.gradeScore>4" class="hot"></div>
         </li>
       </ul>
       <!-- 分页 -->

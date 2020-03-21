@@ -5,6 +5,9 @@
     <div class="detail-wrapper header-bottom">
       <div class="brief-info">
         <div class="dining-info">
+          <div class="res-img" v-if="diningRoomData && diningRoomData.image">
+            <img :src="diningRoomData.image" alt="餐厅图片">
+          </div>
           <h2 class="name">{{diningRoomData && diningRoomData.name || "--"}}</h2>
           <ul class="data-list item">
             <li><span>口味：</span>{{diningRoomData && diningRoomData.tatste || "--"}}</li>

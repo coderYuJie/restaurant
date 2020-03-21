@@ -10,8 +10,15 @@
         </div>
         <div class="block-content" v-if="merchantData && merchantData.diningRoom">
           <div v-for="(val, key, idx) in brifeInfo" :key="idx" class="wrapper">
-            <span class="name">{{val}}:</span>
-            {{merchantData.diningRoom[key] || '--'}}
+            <template v-if="key == 'image'">
+              <div class="res-img">
+                <img :src="merchantData.diningRoom.image" alt="餐厅图片">
+              </div>
+            </template>
+            <template v-else>
+              <span class="name">{{val}}:</span>
+              {{merchantData.diningRoom[key] || '--'}}
+            </template>
           </div>
         </div>
       </div>
@@ -95,6 +102,7 @@ export default {
         current: 1
       },
       brifeInfo: {
+        image: '店铺图片',
         name: '用户名',
         phone: '电话',
         introduce: '简介',

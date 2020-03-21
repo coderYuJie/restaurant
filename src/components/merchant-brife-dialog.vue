@@ -1,13 +1,30 @@
 <template>
   <!-- 商户-简要信息修改dialog  用户评论dialog-->
   <el-dialog :title="dialogTitle" :visible="showDialog" width="600px" center :before-close="hideDialog">
-    <!-- 修改餐厅信息 -->
+    <!-- 修改餐厅信息  image-->
     <el-form
       v-show="formType==1 || formType==8 && Object.keys(diningData).length"
       label-width="80px"
       :model="diningData">
       <el-form-item label="餐厅名">
         <el-input v-model="diningData.name"></el-input>
+      </el-form-item>
+      <el-form-item label="餐厅图片">
+        <div v-if="diningData.image" class="res-img">
+          <img :src="diningData.image" alt="餐厅图片">
+        </div>
+        <el-upload
+          class="upload-demo"
+          accept=".jpg, .jpeg, .png, .gif"
+          :show-file-list="false"
+          :headers="{'Authorization': headerId}"
+          :with-credentials="true"
+          :action="configApi + '/common/upload'"
+          :on-success="uploadSuccess"
+          :on-error="uploadError">
+          <el-button size="small" type="primary">点击上传</el-button>
+          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+        </el-upload>
       </el-form-item>
       <el-form-item label="电话">
         <el-input v-model="diningData.phone"></el-input>
@@ -80,14 +97,14 @@
         <el-input-number v-model="menu.greesPrice" :min="1" :max="1000" label="单价"></el-input-number>
       </el-form-item>
       <el-form-item label="菜单图片">
-        <img v-if="formType==5 && menu.greesPic" :src="menu.greesPic" alt="菜单图片">
+        <img v-if="menu.greesPic" :src="menu.greesPic" alt="菜单图片">
         <el-upload
-          v-else
           class="upload-demo"
           accept=".jpg, .jpeg, .png, .gif"
           :headers="{'Authorization': headerId}"
           :with-credentials="true"
           :action="configApi + '/common/upload'"
+          :show-file-list="false"
           :on-success="uploadSuccess"
           :on-error="uploadError">
           <el-button size="small" type="primary">点击上传</el-button>
@@ -311,7 +328,6 @@ export default {
       }
       obj.startTime = this.dateConvert(this.dataValue[0])
       obj.endTime = this.dateConvert(this.dataValue[1])
-      obj.image = 'asdfasd'
       this.$axios({
         url: url,
         method: 'post',
@@ -421,7 +437,11 @@ export default {
     uploadSuccess (res, file) {
       if (res && res.url) {
         this.$message.success('图片上传成功')
-        this.menu.greesPic = res.url
+        if (this.formType === 2 || this.formType === 5) {
+          this.menu.greesPic = res.url
+        } else if (this.formType === 1 || this.formType === 8) {
+          this.diningData.image = res.url
+        }
       } else {
         this.$message.error(res.message)
       }
@@ -447,5 +467,4 @@ export default {
 </script>
 
 <style lang="less" scoped>
-
 </style>
