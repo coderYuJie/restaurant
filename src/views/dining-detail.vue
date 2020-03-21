@@ -4,9 +4,6 @@
     <restaurant-header @getUserId="getUserId"></restaurant-header>
     <div class="detail-wrapper header-bottom">
       <div class="brief-info">
-        <div class="img">
-          <img src="../assets/img/restaurant.png" alt="商铺图">
-        </div>
         <div class="dining-info">
           <h2 class="name">{{diningRoomData && diningRoomData.name || "--"}}</h2>
           <ul class="data-list item">
@@ -27,7 +24,7 @@
         <div class="block-title">菜单详情</div>
         <div class="block-content" v-if="detailData && detailData.menuList && detailData.menuList.length ">
           <div v-for="(val, key, idx) in detailData.menuList" :key="idx" class="menu-item">
-            <img :src="val.greesPic" alt="商家图片">
+            <img :src="configApi + val.greesPic" alt="商家图片">
             <div class="info-wrapper">
               <div class="item">
                 <span>{{val.greesName}}</span>
@@ -180,7 +177,6 @@ export default {
       })
     }
 
-
   }
 
 }
@@ -210,6 +206,21 @@ export default {
         }
       }
 
+    }
+    .menu-wrapper {
+      .block-content .menu-item {
+        margin-bottom: 18px;
+        img {
+          width: 40px;
+          height: 40px;
+          border-radius: 20px;
+        }
+        .info-wrapper {
+          span {
+            margin-right: 20px;
+          }
+        }
+      }
     }
     // 评论
     .comment {

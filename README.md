@@ -31,23 +31,6 @@ usertype = 3
 
 商户  18577441122    admin
 kai1819@qq.com  kaikai
+15955454544
 
 18599887744    admin
-
-## 用户类型
-
-* userType: 3——个人     2——商户   1——admin
-
-## 已经使用过的接口
-
-* POST /dining-room/merchant/getDiningRoom
-* POST /dining-room/merchant/updateDiningRoom
-
-## 待处理的任务
-
-* 商户个人主页图片需要再次处理(商户那边的菜单和详情编辑)
-* 开发环境需要测试一下
-* 用户预约的dialog 接口未联调
-* 餐厅的订单信息应该显示在餐厅用户的主页面（这个还没写）
-* 餐厅注册信息审核通过后还是不显示最新的订单信息
-* 餐厅的图片可上传

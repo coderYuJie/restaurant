@@ -6,13 +6,9 @@
       <div class="brief-info">
         <div class="block-title">
           简要信息
-          <i class="el-icon-edit-outline" @click="toogleDialog(true, 1)">编辑</i>
+          <i class="el-icon-edit-outline" @click="addOrUpdate">编辑</i>
         </div>
         <div class="block-content" v-if="merchantData && merchantData.diningRoom">
-          <div class="wrapper">
-            <span class="name">头像:</span>
-            <img :src="merchantData.diningRoom.image" alt="">
-          </div>
           <div v-for="(val, key, idx) in brifeInfo" :key="idx" class="wrapper">
             <span class="name">{{val}}:</span>
             {{merchantData.diningRoom[key] || '--'}}
@@ -145,6 +141,13 @@ export default {
         console.log(err)
       })
     },
+    addOrUpdate () {
+      if (this.merchantData === undefined) {
+        this.toogleDialog(true, 8)
+      } else {
+        this.toogleDialog(true, 1)
+      }
+    },
 
     // 表单弹窗
     toogleDialog (val, type) {
@@ -180,22 +183,6 @@ export default {
         console.log(err)
       })
     },
-    
-    // 商户查看菜单信息 GET /dining-menu/merchantAdmin/getDiningRoom/{id
-    // url: `/dining-menu/merchantAdmin/getDiningRoom/8`,
-    // getMenu () {
-    //   this.$axios({
-    //     url: `/dining-menu/merchantAdmin/getDiningRoom/{id}?id=${this.merchantData.diningRoom.id}`,
-    //     method: 'get'
-    //   }).then(res => {
-    //     if (res) {
-    //       this.menuList = res.data
-    //     } else {
-    //     }
-    //   }).catch(err => {
-    //     console.log(err)
-    //   })
-    // }
 
     // 删除菜单信息 DELETE /dining-menu/merchant/deleteDiningRoom/{id}
     deleteMenu (id) {
@@ -230,11 +217,15 @@ export default {
 .merchant-detail .detail-wrapper {
   .block-content {
     padding: 20px 30px;
+
+    .wrapper {
+      line-height: 30px;
+    }
   }
   // 菜单信息
   .menu-info .menu-wrapper {
     display: flex;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     img {
       width: 40px;
       height: 40px;

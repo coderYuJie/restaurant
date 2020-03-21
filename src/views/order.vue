@@ -161,11 +161,15 @@ export default {
     hideDialog () {
       this.showDialog = false
       this.getData()
-    },
+    }
   }
 }
 </script>
 
-<style>
-
+<style lang="less" scoped>
+.order {
+  /deep/ .el-pagination {
+    text-align: center;
+  }
+}
 </style>

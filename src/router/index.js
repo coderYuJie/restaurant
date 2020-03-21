@@ -80,4 +80,13 @@ const router = new VueRouter({
   // mode: 'history'
 })
 
+router.beforeEach((to, from, next) => {
+  const sessionId = sessionStorage.getItem('sessionId')
+  if (to.path === '/login' || sessionId) {
+    next()
+  } else {
+    next('/login')
+  }
+})
+
 export default router

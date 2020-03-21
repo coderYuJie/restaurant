@@ -3,21 +3,10 @@
   <el-dialog :title="dialogTitle" :visible="showDialog" width="600px" center :before-close="hideDialog">
     <!-- 修改餐厅信息 -->
     <el-form
-      v-show="formType==1 && Object.keys(diningData).length"
+      v-show="formType==1 || formType==8 && Object.keys(diningData).length"
       label-width="80px"
       :model="diningData">
-      <el-form-item label="商铺图片">
-        <img v-if="diningData.image" :src="diningData.image" alt="">
-        <el-upload
-          v-else
-          class="upload-demo"
-          action="http://www.kaico.site:1819/orderingmeals/common/upload"
-          :file-list="fileList">
-          <el-button size="small" type="primary">点击上传</el-button>
-          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-        </el-upload>
-      </el-form-item>
-      <el-form-item label="用户名">
+      <el-form-item label="餐厅名">
         <el-input v-model="diningData.name"></el-input>
       </el-form-item>
       <el-form-item label="电话">
@@ -79,7 +68,7 @@
       </el-form-item>
     </el-form>
 
-    <!-- 添加一个菜单 -->
+    <!-- 添加一个菜单 2添加5编辑 -->
     <el-form
       v-show="formType==2 || formType==5"
       label-width="80px"
@@ -91,12 +80,16 @@
         <el-input-number v-model="menu.greesPrice" :min="1" :max="1000" label="单价"></el-input-number>
       </el-form-item>
       <el-form-item label="菜单图片">
-        <img v-if="menu.greesPic" :src="menu.greesPic" alt="">
+        <img v-if="formType==5 && menu.greesPic" :src="menu.greesPic" alt="菜单图片">
         <el-upload
           v-else
           class="upload-demo"
-          action="http://www.kaico.site:1819/orderingmeals/common/upload"
-          :file-list="menu.greesPic">
+          accept=".jpg, .jpeg, .png, .gif"
+          :headers="{'Authorization': headerId}"
+          :with-credentials="true"
+          :action="configApi + '/common/upload'"
+          :on-success="uploadSuccess"
+          :on-error="uploadError">
           <el-button size="small" type="primary">点击上传</el-button>
           <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
         </el-upload>
@@ -116,15 +109,6 @@
       :model="userComment">
       <el-form-item label="评分">
         <el-input-number v-model="userComment.grade" :min="1" :max="10" label="评分"></el-input-number>
-      </el-form-item>
-      <el-form-item label="评论图片">
-        <el-upload
-          class="upload-demo"
-          action="http://www.kaico.site:1819/orderingmeals/common/upload"
-          :file-list="userComment.comment_pic">
-          <el-button size="small" type="primary">点击上传</el-button>
-          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-        </el-upload>
       </el-form-item>
       <el-form-item label="评论">
         <el-input type="textarea" v-model="userComment.comment"></el-input>
@@ -257,7 +241,8 @@ export default {
       newOlder: {
         appointmentTime: null, // 预约时间
         orderList: []
-      }
+      },
+      headerId: null
     }
   },
   computed: {
@@ -271,6 +256,9 @@ export default {
       }
       return sum
     }
+    // headers () {
+    //   return { Authorization: sessionStorage.getItem('sessionId') }
+    // }
   },
   watch: {
     showDialog: {
@@ -287,6 +275,7 @@ export default {
 
   },
   created () {
+    this.headerId = sessionStorage.getItem('sessionId')
   },
   methods: {
     hideDialog () {
@@ -295,7 +284,7 @@ export default {
     },
 
     editBrifeForm () {
-      if (this.formType === 1) {
+      if (this.formType === 1 || this.formType === 8) {
         this.editResInfo()
       } else if (this.formType === 2 || this.formType === 5) {
         this.addMenu()
@@ -315,11 +304,16 @@ export default {
       delete obj.commentCount
       delete obj.userId
       delete obj.createTime
+      if (this.formType === 1) {
+        var url = '/dining-room/merchant/updateDiningRoom'
+      } else {
+        url = '/dining-room/merchant/addDiningRoom'
+      }
       obj.startTime = this.dateConvert(this.dataValue[0])
       obj.endTime = this.dateConvert(this.dataValue[1])
       obj.image = 'asdfasd'
       this.$axios({
-        url: '/dining-room/merchant/updateDiningRoom',
+        url: url,
         method: 'post',
         data: qs.stringify(obj)
       }).then(res => {
@@ -362,7 +356,7 @@ export default {
     // 编辑菜单信息 /dining-menu/merchant/updateDiningRoom
     addMenu () {
       const obj = JSON.parse(JSON.stringify(this.menu))
-      obj.greesPic = 'asdfasdf' // deku假路径
+      // obj.greesPic = 'asdfasdf' // deku假路径
       const url = this.formType === 5 ? '/dining-menu/merchant/updateDiningRoom' : '/dining-menu/merchant/addDiningRoom'
       this.$axios({
         url: url,
@@ -422,6 +416,31 @@ export default {
         console.log(err)
       })
     },
+
+    // 上传控制
+    uploadSuccess (res, file) {
+      if (res && res.url) {
+        this.$message.success('图片上传成功')
+        this.menu.greesPic = res.url
+      } else {
+        this.$message.error(res.message)
+      }
+    },
+    uploadError () {
+      this.$message.error('图片上传失败')
+    },
+    beforeUpload (file) {
+      console.log(file.type, 'asdfasdf')
+      const isJPG = file && (['image/jpeg', 'image/jpg', 'image/png', 'image/gif'].indexOf(file.type) > -1)
+      const isLt1M = file.size / 1024 / 1024 < 1
+      if (!isJPG) {
+        this.$message.error('仅支持JPG，JPEG，GIF，PNG图片文件!')
+      }
+      if (!isLt1M) {
+        this.$message.error('文件大小不能超过10M')
+      }
+      return isJPG && isLt1M
+    }
   }
 
 }

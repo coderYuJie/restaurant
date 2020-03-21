@@ -96,6 +96,7 @@ export default {
 .index {
   .index-main {
     margin-top: 100px;
+    margin-bottom: 100px;
     padding: 0 30px;
 
     .restaurant-list {
@@ -139,14 +140,6 @@ export default {
             span {
               color: #4fabe4;
             }
-          }
-
-          .reservation {
-            margin-top: 10px;
-            width: 80px;
-            height: 30px;
-            background: url('../assets/img/reservation-btn.png');
-            background-size: 100%;
           }
         }
 

@@ -98,14 +98,10 @@ export default {
       }
     },
     isShowSearch () {
-      if (this.$route.path === '/login') {
-        return false
-      } else if (this.$route.path === '/userManagement') {
-        return false
-      } else if (this.$route.path === '/statistics') {
-        return false
-      } else {
+      if (this.$route.path === '/index') {
         return true
+      } else {
+        return false
       }
     }
   },
@@ -160,15 +156,6 @@ export default {
     }
     .search {
       width: 500px;
-
-      // /deep/ .el-input__inner {
-      //   border-color: #ff5000;
-      // }
-      // /deep/ .el-input-group__append button.el-button {
-      //   background-color: #ff5000;
-      //   color: #fff;
-      //   border: none;
-      // }
     }
 
     .register {
