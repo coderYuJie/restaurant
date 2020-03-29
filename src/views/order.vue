@@ -36,8 +36,8 @@
           label="操作">
           <template v-slot:default="obj">
             <el-button @click="deleteOrder(obj.row.id)" type="danger" size="small" plain icon="el-icon-delete"></el-button>
-            <el-button @click="payOlder(obj.row.id, obj.row.prize)" size="small" plain icon="el-icon-coin"></el-button>
-            <el-button @click="editOlder(obj.row)" size="small" plain icon="el-icon-edit-outline"></el-button>
+            <el-button :disabled="!!obj.row.isPay" @click="payOlder(obj.row.id, obj.row.prize)" size="small" plain icon="el-icon-coin"></el-button>
+            <el-button :disabled="!!obj.row.isPay" @click="editOlder(obj.row)" size="small" plain icon="el-icon-edit-outline"></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -166,6 +166,10 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="less" scoped>
+.order {
+  /deep/ .el-pagination {
+    text-align: center;
+  }
+}
 </style>

@@ -4,7 +4,8 @@ module.exports = {
     hot: true,
     proxy: {
       '/': {
-        target: 'http://www.kaico.site:1819/orderingmeals/',
+        // target: 'http://www.kaico.site:1819/orderingmeals/',
+        target: 'http://localhost:1819/orderingmeals/',
         pathRewrite: { '^/': '' }
       }
     }

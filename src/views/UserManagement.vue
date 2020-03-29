@@ -279,10 +279,10 @@ export default {
         confirm: ''
       },
       imgSrcs: {
-        a: 'static/a.jpg',
-        b: 'static/b.jpeg',
-        c: 'static/c.jpg',
-        d: 'static/d.jpeg'
+        a: 'static/a.png',
+        b: 'static/b.png',
+        c: 'static/c.png',
+        d: 'static/d.png'
       },
       addUserRules: {
         name: [
@@ -511,7 +511,7 @@ export default {
 .management-main {
   width: 80%;
   min-width: 800px;
-  margin: 0 auto;
+  margin: 80px auto 0;
   .adduser {
     margin: 20px 0;
   }

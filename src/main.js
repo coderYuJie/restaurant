@@ -10,18 +10,24 @@ import RestaurantHeader from './components/RestaurantHeader.vue'
 import '@/assets/less/common.less'
 import '@/assets/less/element-trans.less'
 
+const config = {
+  baseURL: process.env.NODE_ENV === 'production' ? 'http://localhost:1819/orderingmeals' : '',
+  timeout: 13 * 1000, // Timeout
+  withCredentials: true // Check cross-site Access-Control
+}
+const _axios = axios.create(config)
+console.log('asdfasdf', _axios.defaults.baseURL)
+Vue.prototype.configApi = _axios.defaults.baseURL
+
 // 添加请求拦截器
-axios.interceptors.request.use(config => {
-  // 在发送请求之前做些什么
+_axios.interceptors.request.use(config => {
   config.headers.Authorization = sessionStorage.getItem('sessionId')
   return config
 }, error => {
-  // 对请求错误做些什么
   return Promise.reject(error)
 })
 // 添加响应拦截器
-axios.interceptors.response.use(response => {
-  // 对响应数据做点什么
+_axios.interceptors.response.use(response => {
   response = response.data
   if (response.code === 201) {
     sessionStorage.removeItem('token')
@@ -30,12 +36,11 @@ axios.interceptors.response.use(response => {
   }
   return response
 }, error => {
-  // 对响应错误做点什么
   return Promise.reject(error)
 })
 // 将axios挂载到vue的原型上
-axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
-Vue.prototype.$axios = axios
+_axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+Vue.prototype.$axios = _axios
 
 Vue.use(ElementUI)
 Vue.component(RestaurantHeader.name, RestaurantHeader)

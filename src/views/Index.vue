@@ -6,7 +6,9 @@
       <!-- 餐厅展示列表 -->
       <ul class="restaurant-list">
         <li v-for="item in restaurantList" :key="item.id" class="restaurant-item">
-          <img src="@/assets/img/restaurant.png" alt="">
+          <img v-if="item && item.image" :src="item.image" alt="">
+          <img v-else src="@/assets/img/restaurant.png" alt="">
+          <!-- <img src="@/assets/img/restaurant.png" alt=""> -->
           <div class="item-main">
             <div class="item-tit">{{item.name}}</div>
             <div class="item-info">
@@ -75,6 +77,7 @@ export default {
     },
     handleCurrentChange (val) {
       this.search.current = val
+      this.getRestaurantList()
     },
     handleSearch (val) {
       this.search.diningRoomName = val
@@ -96,6 +99,7 @@ export default {
 .index {
   .index-main {
     margin-top: 100px;
+    margin-bottom: 100px;
     padding: 0 30px;
 
     .restaurant-list {
@@ -117,6 +121,8 @@ export default {
 
         img {
           height: 140px;
+          max-width: 240px;
+          min-width: 240px;
         }
 
         .item-main {
@@ -139,14 +145,6 @@ export default {
             span {
               color: #4fabe4;
             }
-          }
-
-          .reservation {
-            margin-top: 10px;
-            width: 80px;
-            height: 30px;
-            background: url('../assets/img/reservation-btn.png');
-            background-size: 100%;
           }
         }
 
