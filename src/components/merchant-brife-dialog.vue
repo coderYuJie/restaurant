@@ -87,8 +87,10 @@
     <el-form
       v-show="formType==2 || formType==5"
       label-width="80px"
-      :model="menu">
-      <el-form-item label="菜单名称">
+      :model="menu"
+      :rules="menuRules"
+      ref="addMenu">
+      <el-form-item label="菜单名称" prop="greesName">
         <el-input v-model="menu.greesName"></el-input>
       </el-form-item>
       <el-form-item label="价格">
@@ -111,7 +113,7 @@
       <el-form-item label="含量">
         <el-input-number v-model="menu.gressContent" :min="1" :max="1000" label="含量"></el-input-number>
       </el-form-item>
-      <el-form-item label="菜单描述">
+      <el-form-item label="菜单描述" prop="describe">
         <el-input type="textarea" v-model="menu.describe"></el-input>
       </el-form-item>
     </el-form>
@@ -260,6 +262,14 @@ export default {
         disabledDate (time) {
           return time.getTime() < Date.now() - 8.64e7
         }
+      },
+      menuRules: {
+        greesName: [
+          { required: true, message: '请输入菜单名称', trigger: 'blur' }
+        ],
+        describe: [
+          { required: true, message: '请输入菜单描述', trigger: 'blur' }
+        ]
       }
     }
   },
@@ -356,7 +366,7 @@ export default {
     // 编辑订单 /dining-menu-order/consumer/updateDiningMenuOrder?id=2&prize=1212&appointmentTime=
     editOrder () {
       this.$axios({
-        url: `/dining-menu-order/consumer/updateDiningMenuOrder?id=${this.editOrderInfo.id}&appointmentTime=${this.editOrderInfo.appointmentTime}`,
+        url: `/dining-menu-order/consumer/updateDiningMenuOrder?id=${this.editOrderInfo.id}&appointmentTime=${this.dateConvert(this.editOrderInfo.appointmentTime)}`,
         method: 'post'
       }).then(res => {
         if (res) {
@@ -374,22 +384,29 @@ export default {
     // 编辑菜单信息 /dining-menu/merchant/updateDiningRoom
     addMenu () {
       const obj = JSON.parse(JSON.stringify(this.menu))
-      // obj.greesPic = 'asdfasdf' // deku假路径
       const url = this.formType === 5 ? '/dining-menu/merchant/updateDiningRoom' : '/dining-menu/merchant/addDiningRoom'
-      this.$axios({
-        url: url,
-        method: 'post',
-        data: qs.stringify(obj)
-      }).then(res => {
-        if (res) {
-          const msg = this.formType === 5 ? '菜单编辑成功' : '菜单添加成功'
-          this.$message.success(msg)
-          this.hideDialog()
-        } else {
-          this.$message.error(res.msg)
+      this.$refs.addMenu.validate((valid) => {
+        if (valid) {
+          if (!obj.greesPic.length) {
+            this.$message.warning('请上传菜品图片')
+          } else {
+            this.$axios({
+              url: url,
+              method: 'post',
+              data: qs.stringify(obj)
+            }).then(res => {
+              if (res) {
+                const msg = this.formType === 5 ? '菜单编辑成功' : '菜单添加成功'
+                this.$message.success(msg)
+                this.hideDialog()
+              } else {
+                this.$message.error(res.msg)
+              }
+            }).catch(err => {
+              console.log(err)
+            })
+          }
         }
-      }).catch(err => {
-        console.log(err)
       })
     },
 
@@ -440,7 +457,7 @@ export default {
       if (res && res.url) {
         this.$message.success('图片上传成功')
         // eslint-disable-next-line no-undef
-        if (this.formType===1 || this.formType===8) {
+        if (this.formType === 1 || this.formType === 8) {
           this.diningData.image = res.url
           console.log('图片写入')
         } else {
@@ -471,5 +488,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-
+img {
+  max-width: 200px;
+}
 </style>
